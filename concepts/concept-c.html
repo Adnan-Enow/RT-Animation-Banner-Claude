@@ -1,0 +1,644 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>RecruitTalent — Concept C: The Pipeline</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; }
+
+  body { background: #1a1a1a; display: grid; place-items: center; }
+
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    max-width: 1680px; max-height: 945px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .scene {
+    position: absolute; inset: 0;
+    opacity: 0;
+    animation: 22s linear infinite;
+  }
+
+  /* Progress dots at top */
+  .progress {
+    position: absolute;
+    top: 32px; left: 50%;
+    transform: translateX(-50%);
+    display: flex; gap: 8px;
+    z-index: 50;
+  }
+  .pdot {
+    width: 32px; height: 4px; border-radius: 2px;
+    background: rgba(0,0,0,0.1);
+    overflow: hidden;
+    position: relative;
+  }
+  .pdot::after {
+    content:''; position: absolute; inset: 0;
+    background: #1c1c1c;
+    transform: scaleX(0); transform-origin: left;
+    animation: 22s linear infinite;
+  }
+  .pdot:nth-child(1)::after { animation-name: dot1; }
+  .pdot:nth-child(2)::after { animation-name: dot2; }
+  .pdot:nth-child(3)::after { animation-name: dot3; }
+  .pdot:nth-child(4)::after { animation-name: dot4; }
+  .pdot:nth-child(5)::after { animation-name: dot5; }
+  @keyframes dot1 { 0%,1% {transform: scaleX(0)} 14%,100% {transform: scaleX(1)} }
+  @keyframes dot2 { 0%,16% {transform: scaleX(0)} 30%,100% {transform: scaleX(1)} }
+  @keyframes dot3 { 0%,32% {transform: scaleX(0)} 50%,100% {transform: scaleX(1)} }
+  @keyframes dot4 { 0%,52% {transform: scaleX(0)} 70%,100% {transform: scaleX(1)} }
+  @keyframes dot5 { 0%,72% {transform: scaleX(0)} 86%,100% {transform: scaleX(1)} }
+
+  /* Section label */
+  .section-label {
+    position: absolute;
+    top: 70px; left: 50%; transform: translateX(-50%);
+    font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+    color: rgba(0,0,0,0.4); z-index: 50;
+    font-weight: 500;
+  }
+
+  /* === SCENE 1 — Brief / RFP === */
+  .scene-1 { background: #ebe3d2; animation-name: scene1-show; }
+  @keyframes scene1-show {
+    0%, 14% { opacity: 1; }
+    16%, 100% { opacity: 0; }
+  }
+  .doc {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 540px; height: 480px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.12);
+    padding: 40px 44px;
+    animation: doc-rise 0.8s cubic-bezier(.22,1,.36,1) 0.3s both;
+  }
+  @keyframes doc-rise { from { opacity:0; transform: translate(-50%, calc(-50% + 14px)); } to { opacity:1; transform: translate(-50%,-50%); } }
+  .doc-tag { font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: #a3927a; margin-bottom: 14px; }
+  .doc-h1 { font-family: 'Instrument Serif', serif; font-size: 30px; color: #1c1c1c; line-height: 1.2; margin-bottom: 22px; }
+  .doc-h1 .typed {
+    display: inline-block; overflow: hidden; white-space: nowrap;
+    width: 0;
+    animation: typewriter1 2.5s steps(30, end) forwards;
+    animation-delay: 1s;
+  }
+  @keyframes typewriter1 { to { width: 30ch; } }
+  .doc-line { height: 8px; background: #f3eee2; border-radius: 3px; margin-bottom: 10px; }
+  .doc-line:nth-child(4) { width: 90%; }
+  .doc-line:nth-child(5) { width: 75%; }
+  .doc-line:nth-child(6) { width: 85%; animation-delay: 0.6s; }
+  .doc-line:nth-child(7) { width: 60%; }
+  .doc-meta {
+    display: flex; gap: 18px; margin-top: 24px;
+    font-size: 11px; color: #8a8270;
+  }
+
+  /* === SCENE 2 — Proposal === */
+  .scene-2 { background: #e3dccb; animation-name: scene2-show; }
+  @keyframes scene2-show {
+    0%, 14% { opacity: 0; }
+    16%, 30% { opacity: 1; }
+    32%, 100% { opacity: 0; }
+  }
+  .proposal {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 700px; height: 480px;
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.1);
+    padding: 32px 40px;
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 28px;
+    animation: doc-rise 0.7s cubic-bezier(.22,1,.36,1) both;
+    animation-delay: 3.5s;
+  }
+  .prop-side { border-right: 1px solid #f3eee2; padding-right: 24px; }
+  .prop-num { font-family: 'Instrument Serif', serif; font-size: 36px; color: #5a4a30; }
+  .prop-side-h { font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: #a3927a; margin: 6px 0 22px; }
+  .prop-side-item {
+    display: flex; align-items: center; gap: 8px;
+    font-size: 12px; color: #6b5e44;
+    padding: 8px 0;
+    border-top: 1px solid #f3eee2;
+  }
+  .prop-side-item.active { color: #5a4a30; font-weight: 500; }
+  .prop-side-item::before {
+    content:''; width: 14px; height: 14px; border-radius: 4px;
+    background: #f3eee2;
+    display: inline-block;
+  }
+  .prop-side-item.active::before { background: #5a4a30; }
+  .prop-main { display: flex; flex-direction: column; }
+  .prop-tag {
+    display: inline-block; padding: 4px 10px; background: #f3eee2;
+    color: #5a4a30; font-size: 10px; border-radius: 999px;
+    text-transform: uppercase; letter-spacing: 0.1em;
+    margin-bottom: 14px; align-self: flex-start;
+  }
+  .prop-h { font-family: 'Instrument Serif', serif; font-size: 26px; color: #1c1c1c; margin-bottom: 18px; }
+  .prop-l { height: 7px; background: #f3eee2; border-radius: 3px; margin-bottom: 8px; }
+  .prop-l:last-of-type { width: 70%; }
+  .prop-cost {
+    margin-top: auto;
+    display: flex; justify-content: space-between; align-items: center;
+    padding-top: 18px; border-top: 1px solid #f3eee2;
+  }
+  .prop-cost-lbl { font-size: 11px; color: #a3927a; text-transform: uppercase; letter-spacing: 0.1em; }
+  .prop-cost-num { font-family: 'Instrument Serif', serif; font-size: 28px; color: #1c1c1c; }
+
+  /* === SCENE 3 — Software / Code === */
+  .scene-3 { background: #1a1f2e; animation-name: scene3-show; }
+  @keyframes scene3-show {
+    0%, 30% { opacity: 0; }
+    32%, 50% { opacity: 1; }
+    52%, 100% { opacity: 0; }
+  }
+  .scene-3 .section-label { color: rgba(255,255,255,0.4); }
+  .ide {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 760px; height: 460px;
+    background: #0f1422;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    overflow: hidden;
+    display: grid;
+    grid-template-columns: 180px 1fr 200px;
+    animation: doc-rise 0.7s cubic-bezier(.22,1,.36,1) 7s both;
+  }
+  .ide-bar {
+    height: 32px; background: #0a0e1a;
+    display: flex; align-items: center;
+    padding: 0 14px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    grid-column: 1 / -1;
+  }
+  .ide-dot { width: 11px; height: 11px; border-radius: 50%; margin-right: 7px; }
+  .ide-dot.r { background: #ff5f57; }
+  .ide-dot.y { background: #febc2e; }
+  .ide-dot.g { background: #28c840; }
+  .ide-content { display: contents; }
+  .ide-side {
+    background: #0a0e1a;
+    padding: 16px 14px;
+    border-right: 1px solid rgba(255,255,255,0.05);
+  }
+  .ide-fitem {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px; color: rgba(255,255,255,0.5);
+    padding: 4px 0; display: flex; align-items: center; gap: 6px;
+  }
+  .ide-fitem.active { color: #f5b35a; }
+  .ide-fitem::before { content: '▸'; opacity: 0.5; }
+  .ide-fitem.open::before { content: '▾'; }
+  .ide-fitem.f::before { content: ''; width: 4px; }
+  .ide-code {
+    padding: 18px 22px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; line-height: 1.7;
+    color: rgba(255,255,255,0.85);
+  }
+  .ide-line { display: block; }
+  .ide-line .kw { color: #c084fc; }
+  .ide-line .fn { color: #60a5fa; }
+  .ide-line .st { color: #a3e635; }
+  .ide-line .num { color: #f59e0b; }
+  .ide-line .cm { color: rgba(255,255,255,0.3); }
+  .ide-typed { display: inline-block; overflow: hidden; white-space: nowrap; vertical-align: top; }
+  .ide-typed-1 { width: 0; animation: codetype1 1.5s steps(30) 8s forwards; }
+  .ide-typed-2 { width: 0; animation: codetype1 1.5s steps(35) 8.6s forwards; }
+  .ide-typed-3 { width: 0; animation: codetype1 1.5s steps(40) 9.3s forwards; }
+  .ide-typed-4 { width: 0; animation: codetype1 1.5s steps(35) 9.9s forwards; }
+  .ide-typed-5 { width: 0; animation: codetype1 1.5s steps(30) 10.5s forwards; }
+  @keyframes codetype1 { to { width: 100%; } }
+  .ide-pane {
+    background: #0a0e1a;
+    border-left: 1px solid rgba(255,255,255,0.05);
+    padding: 14px;
+  }
+  .ide-pane-h { font-size: 10px; text-transform: uppercase; letter-spacing: 0.12em; color: rgba(255,255,255,0.4); margin-bottom: 12px; }
+  .ide-test {
+    display: flex; align-items: center; gap: 8px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    padding: 6px 0;
+    color: rgba(255,255,255,0.7);
+  }
+  .ide-test::before {
+    content: '✓'; width: 14px; height: 14px;
+    background: #16a34a; color: #fff;
+    border-radius: 50%; display: grid; place-items: center;
+    font-size: 9px;
+    animation: check-in 0.3s ease-out forwards;
+    transform: scale(0);
+  }
+  .ide-test:nth-child(2)::before { animation-delay: 9s; }
+  .ide-test:nth-child(3)::before { animation-delay: 9.5s; }
+  .ide-test:nth-child(4)::before { animation-delay: 10s; }
+  .ide-test:nth-child(5)::before { animation-delay: 10.5s; }
+  @keyframes check-in { to { transform: scale(1); } }
+
+  /* === SCENE 4 — Recruitment / Candidate cards === */
+  .scene-4 { background: #d8e3dd; animation-name: scene4-show; }
+  @keyframes scene4-show {
+    0%, 50% { opacity: 0; }
+    52%, 70% { opacity: 1; }
+    72%, 100% { opacity: 0; }
+  }
+  .candidates {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    display: grid;
+    grid-template-columns: repeat(3, 240px);
+    gap: 20px;
+  }
+  .cand-card {
+    background: #fff;
+    border-radius: 14px;
+    padding: 22px 22px;
+    box-shadow: 0 14px 40px rgba(0,0,0,0.06);
+    opacity: 0; transform: translateY(20px);
+    animation: cand-in 0.6s cubic-bezier(.22,1,.36,1) forwards;
+    position: relative;
+  }
+  .cand-card:nth-child(1) { animation-delay: 11.5s; }
+  .cand-card:nth-child(2) { animation-delay: 11.7s; }
+  .cand-card:nth-child(3) { animation-delay: 11.9s; }
+  @keyframes cand-in { to { opacity:1; transform: translateY(0); } }
+  .cand-card.match {
+    box-shadow: 0 14px 40px rgba(34,107,80,0.18), 0 0 0 2px #2d6b50;
+    transform: translateY(-4px);
+    animation: cand-in 0.6s cubic-bezier(.22,1,.36,1) 11.7s forwards, match-glow 0.5s ease-out 13s forwards;
+  }
+  @keyframes match-glow {
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+    100% { transform: translateY(-4px); }
+  }
+  .cand-row { display: flex; align-items: center; gap: 14px; }
+  .cand-avatar {
+    width: 44px; height: 44px; border-radius: 50%;
+    background: linear-gradient(135deg, #c9a682, #6a4d30);
+    flex-shrink: 0;
+  }
+  .cand-card:nth-child(1) .cand-avatar { background: linear-gradient(135deg, #b09783, #4a3a30); }
+  .cand-card:nth-child(2) .cand-avatar { background: linear-gradient(135deg, #c9a682, #6a4d30); }
+  .cand-card:nth-child(3) .cand-avatar { background: linear-gradient(135deg, #aab7a3, #4a5a4a); }
+  .cand-name { font-size: 14px; font-weight: 600; color: #1c1c1c; }
+  .cand-role { font-size: 11px; color: #6b6b6b; }
+  .cand-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 16px; }
+  .cand-tag {
+    padding: 3px 8px; background: #f5f3ee; border-radius: 4px;
+    font-size: 10px; color: #5a5a5a;
+  }
+  .cand-card.match .cand-tag { background: #e3efe9; color: #2d6b50; }
+  .cand-meta { display: flex; gap: 16px; margin-top: 14px; padding-top: 14px; border-top: 1px solid #f1eee5; font-size: 10px; color: #8a8a8a; }
+  .cand-meta strong { display: block; color: #1c1c1c; font-size: 13px; margin-bottom: 2px; }
+  .match-badge {
+    position: absolute; top: -10px; right: -10px;
+    background: #2d6b50; color: #fff;
+    width: 32px; height: 32px; border-radius: 50%;
+    display: grid; place-items: center;
+    box-shadow: 0 4px 12px rgba(45,107,80,0.4);
+    opacity: 0;
+    animation: badge-pop 0.4s cubic-bezier(.22,1,.5,1.5) 13.2s forwards;
+  }
+  @keyframes badge-pop { from { transform: scale(0); } to { opacity:1; transform: scale(1); } }
+
+  /* === SCENE 5 — Help Desk === */
+  .scene-5 { background: #2a2520; animation-name: scene5-show; }
+  @keyframes scene5-show {
+    0%, 70% { opacity: 0; }
+    72%, 86% { opacity: 1; }
+    88%, 100% { opacity: 0; }
+  }
+  .scene-5 .section-label { color: rgba(255,255,255,0.4); }
+  .helpdesk {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 760px; height: 440px;
+    background: #1c1815;
+    border-radius: 14px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    overflow: hidden;
+    animation: doc-rise 0.7s cubic-bezier(.22,1,.36,1) 16s both;
+    display: flex; flex-direction: column;
+  }
+  .hd-header {
+    padding: 18px 24px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .hd-h-l { font-size: 13px; color: #f0e9d8; font-weight: 500; }
+  .hd-h-r { display: flex; gap: 18px; }
+  .hd-stat-l { font-size: 9px; color: rgba(255,255,255,0.4); text-transform: uppercase; letter-spacing: 0.1em; }
+  .hd-stat-v { font-size: 16px; color: #f0e9d8; font-weight: 600; font-family: 'Instrument Serif', serif; }
+  .hd-stat-v.green { color: #4ade80; }
+  .hd-tickets { padding: 8px 0; flex: 1; overflow: hidden; }
+  .hd-ticket {
+    display: grid;
+    grid-template-columns: 24px 60px 1fr 100px 80px;
+    gap: 16px; align-items: center;
+    padding: 12px 24px;
+    border-bottom: 1px solid rgba(255,255,255,0.03);
+    opacity: 0; transform: translateX(-10px);
+    animation: ticket-in 0.4s ease-out forwards;
+  }
+  .hd-ticket:nth-child(1) { animation-delay: 16.6s; }
+  .hd-ticket:nth-child(2) { animation-delay: 16.8s; }
+  .hd-ticket:nth-child(3) { animation-delay: 17s; }
+  .hd-ticket:nth-child(4) { animation-delay: 17.2s; }
+  .hd-ticket:nth-child(5) { animation-delay: 17.4s; }
+  @keyframes ticket-in { to { opacity:1; transform: translateX(0); } }
+  .hd-tcheck {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: rgba(74,222,128,0.15);
+    color: #4ade80;
+    display: grid; place-items: center;
+    font-size: 11px;
+  }
+  .hd-tid { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: rgba(255,255,255,0.4); }
+  .hd-ttitle { font-size: 12px; color: #f0e9d8; }
+  .hd-ttime { font-size: 10px; color: rgba(255,255,255,0.4); }
+  .hd-tstatus {
+    font-size: 9px; padding: 3px 8px; border-radius: 999px;
+    background: rgba(74,222,128,0.15); color: #4ade80;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    text-align: center;
+  }
+
+  /* === SCENE 6 — bento + logo === */
+  .scene-6 { background: #f1ece0; animation-name: scene6-show; }
+  @keyframes scene6-show {
+    0%, 86% { opacity: 0; }
+    88%, 100% { opacity: 1; }
+  }
+  .bento {
+    position: absolute;
+    left: 8%; top: 10%; width: 84%; height: 60%;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
+  .bento-cell {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+    padding: 18px;
+    opacity: 0; transform: scale(0.85);
+    animation: bento-in 0.5s cubic-bezier(.22,1,.36,1) forwards;
+    display: flex; flex-direction: column;
+  }
+  .bento-cell:nth-child(1) { animation-delay: 19.5s; }
+  .bento-cell:nth-child(2) { animation-delay: 19.65s; }
+  .bento-cell:nth-child(3) { animation-delay: 19.8s; }
+  .bento-cell:nth-child(4) { animation-delay: 19.95s; }
+  @keyframes bento-in { to { opacity:1; transform: scale(1); } }
+  .bento-ic { width: 28px; height: 28px; border-radius: 7px; background: #f3eee2; color: #5a4a30; display: grid; place-items: center; margin-bottom: 14px; }
+  .bento-ic svg { width: 14px; height: 14px; }
+  .bento-l { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: #a3927a; margin-bottom: 4px; }
+  .bento-t { font-size: 13px; font-weight: 600; color: #1c1c1c; }
+  .bento-mini-bar { height: 4px; background: #f3eee2; border-radius: 2px; margin-top: auto; }
+  .bento-mini-bar::after { content:''; display:block; height: 100%; background: #5a4a30; border-radius: 2px; transform: scaleX(0); transform-origin: left; animation: bar-fill 0.8s ease-out forwards; }
+  .bento-cell:nth-child(1) .bento-mini-bar::after { animation-delay: 20.3s; --w: 0.9; }
+  @keyframes bar-fill { to { transform: scaleX(0.85); } }
+
+  .s6-logo-wrap {
+    position: absolute;
+    bottom: 8%; left: 50%;
+    transform: translateX(-50%);
+    text-align: center;
+    opacity: 0;
+    animation: fade-up 0.9s cubic-bezier(.22,1,.36,1) 20.5s forwards;
+  }
+  @keyframes fade-up {
+    from { opacity:0; transform: translate(-50%, 8px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+  }
+  .s6-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 48px; color: #1c1c1c;
+    letter-spacing: -0.02em;
+  }
+  .s6-logo span { color: #5a4a30; font-style: italic; }
+  .s6-tagline {
+    font-size: 12px; color: #8a8270;
+    letter-spacing: 0.15em; text-transform: uppercase;
+    margin-top: 10px;
+  }
+
+  /* HUD */
+  .hud {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.75); color: #fff; backdrop-filter: blur(10px);
+    padding: 8px 16px; border-radius: 999px; font-size: 12px;
+    z-index: 100; display: flex; gap: 16px; align-items: center;
+  }
+  .hud a { color: #d4a988; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <div class="progress">
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+      <div class="pdot"></div>
+    </div>
+
+    <!-- SCENE 1: Brief -->
+    <div class="scene scene-1">
+      <div class="section-label">01 — The Brief</div>
+      <div class="doc">
+        <div class="doc-tag">Project Brief · 02.04.25</div>
+        <div class="doc-h1"><span class="typed">Modernize legacy banking platform.</span></div>
+        <div class="doc-line"></div>
+        <div class="doc-line"></div>
+        <div class="doc-line"></div>
+        <div class="doc-line"></div>
+        <div class="doc-meta">
+          <div>Acme Financial</div><div>·</div><div>12 weeks</div><div>·</div><div>Enterprise</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 2: Proposal -->
+    <div class="scene scene-2">
+      <div class="section-label">02 — Proposal Development</div>
+      <div class="proposal">
+        <div class="prop-side">
+          <div class="prop-num">01</div>
+          <div class="prop-side-h">Sections</div>
+          <div class="prop-side-item active">Executive Summary</div>
+          <div class="prop-side-item">Approach & Methodology</div>
+          <div class="prop-side-item">Team & Capabilities</div>
+          <div class="prop-side-item">Timeline</div>
+          <div class="prop-side-item">Investment</div>
+        </div>
+        <div class="prop-main">
+          <div class="prop-tag">Proposal v3</div>
+          <div class="prop-h">A modern, modular path forward.</div>
+          <div class="prop-l"></div>
+          <div class="prop-l"></div>
+          <div class="prop-l"></div>
+          <div class="prop-l"></div>
+          <div class="prop-cost">
+            <div>
+              <div class="prop-cost-lbl">Total investment</div>
+              <div class="prop-cost-num">$284,000</div>
+            </div>
+            <div>
+              <div class="prop-cost-lbl">Duration</div>
+              <div class="prop-cost-num">12 wks</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: Code/IDE -->
+    <div class="scene scene-3">
+      <div class="section-label">03 — Software Services</div>
+      <div class="ide">
+        <div class="ide-bar">
+          <div class="ide-dot r"></div><div class="ide-dot y"></div><div class="ide-dot g"></div>
+          <div style="font-family:'JetBrains Mono', monospace; font-size:10px; color:rgba(255,255,255,0.5); margin-left:14px;">acme-platform / api / users.ts</div>
+        </div>
+        <div class="ide-side">
+          <div class="ide-fitem open">src</div>
+          <div class="ide-fitem f" style="padding-left:16px">api</div>
+          <div class="ide-fitem f active" style="padding-left:32px">users.ts</div>
+          <div class="ide-fitem f" style="padding-left:32px">auth.ts</div>
+          <div class="ide-fitem f" style="padding-left:32px">payments.ts</div>
+          <div class="ide-fitem f" style="padding-left:16px">lib</div>
+          <div class="ide-fitem f" style="padding-left:16px">tests</div>
+        </div>
+        <div class="ide-code">
+          <span class="ide-line"><span class="cm">// Modern API · type-safe</span></span>
+          <span class="ide-line"><span class="ide-typed ide-typed-1"><span class="kw">export const</span> <span class="fn">getUsers</span> = <span class="kw">async</span> () => {</span></span>
+          <span class="ide-line">&nbsp;&nbsp;<span class="ide-typed ide-typed-2"><span class="kw">const</span> users = <span class="kw">await</span> db.<span class="fn">query</span>(<span class="st">'users'</span>);</span></span>
+          <span class="ide-line">&nbsp;&nbsp;<span class="ide-typed ide-typed-3"><span class="kw">return</span> users.<span class="fn">map</span>(<span class="fn">serialize</span>);</span></span>
+          <span class="ide-line"><span class="ide-typed ide-typed-4">};</span></span>
+          <span class="ide-line">&nbsp;</span>
+          <span class="ide-line"><span class="ide-typed ide-typed-5"><span class="cm">// All tests passing</span></span></span>
+        </div>
+        <div class="ide-pane">
+          <div class="ide-pane-h">Test results</div>
+          <div class="ide-test">getUsers returns array</div>
+          <div class="ide-test">handles empty state</div>
+          <div class="ide-test">validates schema</div>
+          <div class="ide-test">200ms p99 latency</div>
+          <div style="margin-top: 16px; padding: 10px 12px; background: rgba(74,222,128,0.08); border-left: 2px solid #4ade80; border-radius: 4px;">
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 10px; color: #4ade80;">✓ 24 / 24 passing</div>
+            <div style="font-family: 'JetBrains Mono', monospace; font-size: 9px; color: rgba(255,255,255,0.4); margin-top: 3px;">2.3s · coverage 94%</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 4: Recruitment -->
+    <div class="scene scene-4">
+      <div class="section-label">04 — Recruitment & Staffing</div>
+      <div class="candidates">
+        <div class="cand-card">
+          <div class="cand-row"><div class="cand-avatar"></div><div><div class="cand-name">Priya Shah</div><div class="cand-role">Frontend Engineer</div></div></div>
+          <div class="cand-tags"><div class="cand-tag">React</div><div class="cand-tag">TypeScript</div><div class="cand-tag">Figma</div></div>
+          <div class="cand-meta"><div><strong>6 yrs</strong>Experience</div><div><strong>Remote</strong>Location</div></div>
+        </div>
+        <div class="cand-card match">
+          <div class="match-badge"><svg viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg></div>
+          <div class="cand-row"><div class="cand-avatar"></div><div><div class="cand-name">Daniel Okafor</div><div class="cand-role">Senior Backend Eng.</div></div></div>
+          <div class="cand-tags"><div class="cand-tag">Node.js</div><div class="cand-tag">Postgres</div><div class="cand-tag">AWS</div><div class="cand-tag">Banking</div></div>
+          <div class="cand-meta"><div><strong>9 yrs</strong>Experience</div><div><strong>Hybrid</strong>Location</div></div>
+        </div>
+        <div class="cand-card">
+          <div class="cand-row"><div class="cand-avatar"></div><div><div class="cand-name">Sara Lindberg</div><div class="cand-role">DevOps Lead</div></div></div>
+          <div class="cand-tags"><div class="cand-tag">Kubernetes</div><div class="cand-tag">Terraform</div></div>
+          <div class="cand-meta"><div><strong>7 yrs</strong>Experience</div><div><strong>Remote</strong>Location</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 5: Help Desk -->
+    <div class="scene scene-5">
+      <div class="section-label">05 — Help Desk</div>
+      <div class="helpdesk">
+        <div class="hd-header">
+          <div class="hd-h-l">Acme Platform · Live Support</div>
+          <div class="hd-h-r">
+            <div><div class="hd-stat-l">Open</div><div class="hd-stat-v">3</div></div>
+            <div><div class="hd-stat-l">Resolved 24h</div><div class="hd-stat-v green">47</div></div>
+            <div><div class="hd-stat-l">SLA</div><div class="hd-stat-v green">99.6%</div></div>
+          </div>
+        </div>
+        <div class="hd-tickets">
+          <div class="hd-ticket"><div class="hd-tcheck">✓</div><div class="hd-tid">RT-1842</div><div><div class="hd-ttitle">API timeout on /users endpoint</div><div class="hd-ttime">resolved · 4m</div></div><div></div><div class="hd-tstatus">Resolved</div></div>
+          <div class="hd-ticket"><div class="hd-tcheck">✓</div><div class="hd-tid">RT-1841</div><div><div class="hd-ttitle">Login flow — 2FA delivery delay</div><div class="hd-ttime">resolved · 12m</div></div><div></div><div class="hd-tstatus">Resolved</div></div>
+          <div class="hd-ticket"><div class="hd-tcheck">✓</div><div class="hd-tid">RT-1840</div><div><div class="hd-ttitle">Dashboard chart misalignment</div><div class="hd-ttime">resolved · 38m</div></div><div></div><div class="hd-tstatus">Resolved</div></div>
+          <div class="hd-ticket"><div class="hd-tcheck">✓</div><div class="hd-tid">RT-1839</div><div><div class="hd-ttitle">Payment webhook retry logic</div><div class="hd-ttime">resolved · 1h</div></div><div></div><div class="hd-tstatus">Resolved</div></div>
+          <div class="hd-ticket"><div class="hd-tcheck">✓</div><div class="hd-tid">RT-1838</div><div><div class="hd-ttitle">Mobile build pipeline failing</div><div class="hd-ttime">resolved · 2h</div></div><div></div><div class="hd-tstatus">Resolved</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 6: bento + logo -->
+    <div class="scene scene-6">
+      <div class="bento">
+        <div class="bento-cell">
+          <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+          <div class="bento-l">01</div>
+          <div class="bento-t">Proposal Development</div>
+          <div class="bento-mini-bar"></div>
+        </div>
+        <div class="bento-cell">
+          <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <div class="bento-l">02</div>
+          <div class="bento-t">Software Services</div>
+          <div class="bento-mini-bar"></div>
+        </div>
+        <div class="bento-cell">
+          <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+          <div class="bento-l">03</div>
+          <div class="bento-t">Recruitment & Staffing</div>
+          <div class="bento-mini-bar"></div>
+        </div>
+        <div class="bento-cell">
+          <div class="bento-ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+          <div class="bento-l">04</div>
+          <div class="bento-t">Help Desk 24/7</div>
+          <div class="bento-mini-bar"></div>
+        </div>
+      </div>
+      <div class="s6-logo-wrap">
+        <div class="s6-logo">Recruit<span>Talent</span></div>
+        <div class="s6-tagline">Brief to delivery, end to end.</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="hud">
+    Concept C · The Pipeline · 22s loop
+    <a href="index.html">← gallery</a>
+  </div>
+</body>
+</html>

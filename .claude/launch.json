@@ -1,0 +1,11 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "concepts",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["-y", "serve", "concepts", "-p", "4173", "-l", "4173"],
+      "port": 4173
+    }
+  ]
+}

@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>RecruitTalent — Concept B: The Talent Constellation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Instrument+Serif&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; }
+
+  body {
+    background: #0a0a0a;
+    display: grid; place-items: center;
+  }
+
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    max-width: 1680px; max-height: 945px;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.7);
+    background: radial-gradient(ellipse at 50% 50%, #0d1424 0%, #050810 70%, #02030a 100%);
+  }
+
+  /* Starfield */
+  .stars {
+    position: absolute; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,0.6), transparent),
+      radial-gradient(1px 1px at 28% 42%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 45% 12%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 67% 65%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 82% 28%, rgba(255,255,255,0.5), transparent),
+      radial-gradient(1px 1px at 90% 75%, rgba(255,255,255,0.4), transparent),
+      radial-gradient(1px 1px at 15% 78%, rgba(255,255,255,0.3), transparent),
+      radial-gradient(1px 1px at 55% 88%, rgba(255,255,255,0.4), transparent);
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+  }
+
+  /* Vignette */
+  .stage::after {
+    content: ''; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 50%, transparent 30%, rgba(0,0,0,0.5) 100%);
+    pointer-events: none;
+    z-index: 50;
+  }
+
+  .scene {
+    position: absolute; inset: 0;
+    opacity: 0;
+    animation: 22s linear infinite;
+  }
+
+  /* === SCENE 1 — pulsing core, person silhouette === */
+  .scene-1 { animation-name: scene1-show; }
+  @keyframes scene1-show {
+    0%, 18% { opacity: 1; }
+    20%, 100% { opacity: 0; }
+  }
+  .core {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #f5b35a;
+    box-shadow:
+      0 0 20px rgba(245,179,90,0.8),
+      0 0 60px rgba(245,179,90,0.5),
+      0 0 120px rgba(245,179,90,0.3);
+    animation: core-pulse 2s ease-in-out infinite;
+  }
+  @keyframes core-pulse {
+    0%, 100% { transform: translate(-50%, -50%) scale(1); box-shadow: 0 0 20px rgba(245,179,90,0.8), 0 0 60px rgba(245,179,90,0.5), 0 0 120px rgba(245,179,90,0.3); }
+    50% { transform: translate(-50%, -50%) scale(1.4); box-shadow: 0 0 40px rgba(245,179,90,1), 0 0 100px rgba(245,179,90,0.6), 0 0 180px rgba(245,179,90,0.4); }
+  }
+  .ring {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    border: 1px solid rgba(245,179,90,0.4);
+    animation: ring-expand 3s ease-out infinite;
+  }
+  .ring:nth-child(2) { animation-delay: 1s; }
+  .ring:nth-child(3) { animation-delay: 2s; }
+  @keyframes ring-expand {
+    0% { width: 12px; height: 12px; opacity: 1; }
+    100% { width: 240px; height: 240px; opacity: 0; }
+  }
+  .s1-portrait {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    width: 240px; height: 280px;
+    border-radius: 6px;
+    background:
+      linear-gradient(160deg, rgba(60,80,100,0.4), rgba(20,30,45,0.8)),
+      radial-gradient(circle at 50% 35%, #c9a682 0%, #3a2f25 70%);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,179,90,0.2);
+    opacity: 0;
+    animation: portrait-fade 1.5s cubic-bezier(.22,1,.36,1) 1.8s forwards;
+  }
+  @keyframes portrait-fade {
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  }
+
+  /* === SCENE 2 — connection lines drawing out === */
+  .scene-2 { animation-name: scene2-show; }
+  @keyframes scene2-show {
+    0%, 18% { opacity: 0; }
+    20%, 42% { opacity: 1; }
+    44%, 100% { opacity: 0; }
+  }
+  .s2-center {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px; height: 240px;
+    border-radius: 6px;
+    background:
+      linear-gradient(160deg, rgba(60,80,100,0.4), rgba(20,30,45,0.8)),
+      radial-gradient(circle at 50% 35%, #c9a682 0%, #3a2f25 70%);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,179,90,0.2);
+  }
+  .s2-svg {
+    position: absolute; inset: 0;
+    width: 100%; height: 100%;
+    overflow: visible;
+  }
+  .s2-svg line {
+    stroke: rgba(245,179,90,0.35);
+    stroke-width: 1;
+    stroke-dasharray: 400;
+    stroke-dashoffset: 400;
+    animation: line-draw 0.8s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .s2-svg line:nth-child(1) { animation-delay: 5s; }
+  .s2-svg line:nth-child(2) { animation-delay: 5.2s; }
+  .s2-svg line:nth-child(3) { animation-delay: 5.4s; }
+  .s2-svg line:nth-child(4) { animation-delay: 5.6s; }
+  @keyframes line-draw { to { stroke-dashoffset: 0; } }
+
+  .s2-card {
+    position: absolute;
+    width: 200px;
+    background: rgba(15,22,38,0.85);
+    border: 1px solid rgba(245,179,90,0.25);
+    border-radius: 12px;
+    padding: 16px 18px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 14px 40px rgba(0,0,0,0.5);
+    opacity: 0;
+    transform: scale(0.85);
+    animation: s2-card-in 0.7s cubic-bezier(.22,1,.36,1) forwards;
+    z-index: 10;
+  }
+  @keyframes s2-card-in {
+    to { opacity: 1; transform: scale(1); }
+  }
+  .s2-card-1 { left: 8%; top: 18%; animation-delay: 5.5s; }
+  .s2-card-2 { right: 8%; top: 18%; animation-delay: 5.7s; }
+  .s2-card-3 { left: 8%; bottom: 18%; animation-delay: 5.9s; }
+  .s2-card-4 { right: 8%; bottom: 18%; animation-delay: 6.1s; }
+  .s2-cic {
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    background: rgba(245,179,90,0.12);
+    color: #f5b35a;
+    display: grid; place-items: center;
+    margin-bottom: 10px;
+  }
+  .s2-cic svg { width: 16px; height: 16px; }
+  .s2-clbl { font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em; color: rgba(245,179,90,0.6); margin-bottom: 4px; }
+  .s2-ctit { font-size: 14px; font-weight: 600; color: #f0e9d8; margin-bottom: 10px; }
+  .s2-cbar { height: 3px; background: rgba(245,179,90,0.15); border-radius: 2px; margin-bottom: 4px; }
+  .s2-cbar.s { width: 50%; }
+
+  /* === SCENE 3 — orbital constellation === */
+  .scene-3 { animation-name: scene3-show; }
+  @keyframes scene3-show {
+    0%, 42% { opacity: 0; }
+    44%, 70% { opacity: 1; }
+    72%, 100% { opacity: 0; }
+  }
+  .orbit {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 760px; height: 760px;
+    border-radius: 50%;
+    border: 1px dashed rgba(245,179,90,0.15);
+    animation: rotate 30s linear infinite;
+  }
+  .orbit-2 {
+    width: 520px; height: 520px;
+    animation: rotate 22s linear infinite reverse;
+    border-color: rgba(245,179,90,0.1);
+  }
+  @keyframes rotate {
+    from { transform: translate(-50%, -50%) rotate(0deg); }
+    to { transform: translate(-50%, -50%) rotate(360deg); }
+  }
+  .s3-center {
+    position: absolute;
+    left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 160px; height: 200px;
+    border-radius: 6px;
+    background:
+      linear-gradient(160deg, rgba(60,80,100,0.4), rgba(20,30,45,0.8)),
+      radial-gradient(circle at 50% 35%, #c9a682 0%, #3a2f25 70%);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px rgba(245,179,90,0.3), 0 0 60px rgba(245,179,90,0.2);
+  }
+  .orbiting {
+    position: absolute;
+    width: 60px; height: 60px;
+    background: rgba(15,22,38,0.95);
+    border: 1px solid rgba(245,179,90,0.3);
+    border-radius: 14px;
+    display: grid; place-items: center;
+    color: #f5b35a;
+    box-shadow: 0 0 24px rgba(245,179,90,0.15);
+  }
+  .orbiting svg { width: 24px; height: 24px; }
+  .orbit .orbiting:nth-child(1) { left: -30px; top: 50%; margin-top: -30px; }
+  .orbit .orbiting:nth-child(2) { right: -30px; top: 50%; margin-top: -30px; }
+  .orbit .orbiting:nth-child(3) { left: 50%; top: -30px; margin-left: -30px; }
+  .orbit .orbiting:nth-child(4) { left: 50%; bottom: -30px; margin-left: -30px; }
+  .orbit-2 .orbit-portrait {
+    position: absolute;
+    width: 70px; height: 80px;
+    border-radius: 4px;
+    background: linear-gradient(160deg, rgba(80,60,40,0.9), rgba(40,30,20,1)), radial-gradient(circle at 50% 35%, #c9a682, #3a2f25);
+    border: 1px solid rgba(245,179,90,0.2);
+  }
+  .orbit-2 .orbit-portrait:nth-child(1) { left: -35px; top: 50%; margin-top: -40px; }
+  .orbit-2 .orbit-portrait:nth-child(2) { right: -35px; top: 50%; margin-top: -40px; }
+
+  /* === SCENE 4 — zoom into core, logo emerges === */
+  .scene-4 { animation-name: scene4-show; }
+  @keyframes scene4-show {
+    0%, 70% { opacity: 0; }
+    72%, 88% { opacity: 1; }
+    90%, 100% { opacity: 0; }
+  }
+  .s4-glow {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px; height: 8px;
+    background: #f5b35a;
+    border-radius: 50%;
+    animation: glow-expand 2.5s cubic-bezier(.22,1,.36,1) 16s forwards;
+  }
+  @keyframes glow-expand {
+    0% { width: 8px; height: 8px; box-shadow: 0 0 30px rgba(245,179,90,1); opacity: 1; }
+    50% { width: 600px; height: 600px; opacity: 0.8; }
+    100% { width: 1200px; height: 1200px; opacity: 0; }
+  }
+  .s4-logomark {
+    position: absolute; left: 50%; top: 50%;
+    transform: translate(-50%, -50%) scale(0.5);
+    opacity: 0;
+    animation: logomark-in 1.4s cubic-bezier(.22,1,.36,1) 17.5s forwards;
+  }
+  @keyframes logomark-in {
+    to { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+  }
+  .s4-logomark svg { width: 100px; height: 100px; }
+
+  /* === SCENE 5 — wordmark + tagline === */
+  .scene-5 { animation-name: scene5-show; }
+  @keyframes scene5-show {
+    0%, 88% { opacity: 0; }
+    90%, 100% { opacity: 1; }
+  }
+  .s5-content {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 22px;
+  }
+  .s5-mark {
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fade-up 0.8s ease-out 19.8s forwards;
+  }
+  .s5-mark svg { width: 56px; height: 56px; }
+  .s5-logo {
+    font-family: 'Instrument Serif', serif;
+    font-size: 56px; color: #f0e9d8;
+    letter-spacing: -0.02em;
+    opacity: 0;
+    animation: fade-up 0.9s cubic-bezier(.22,1,.36,1) 20.1s forwards;
+  }
+  .s5-logo span { color: #f5b35a; font-style: italic; }
+  .s5-tagline {
+    font-size: 14px; color: rgba(240,233,216,0.5);
+    letter-spacing: 0.12em; text-transform: uppercase;
+    opacity: 0;
+    animation: fade-up 0.9s cubic-bezier(.22,1,.36,1) 20.6s forwards;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* HUD */
+  .hud {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.7); color: #fff; backdrop-filter: blur(10px);
+    padding: 8px 16px; border-radius: 999px; font-size: 12px;
+    z-index: 100; display: flex; gap: 16px; align-items: center;
+  }
+  .hud a { color: #f5b35a; text-decoration: none; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="stars"></div>
+
+    <!-- SCENE 1 -->
+    <div class="scene scene-1">
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="ring"></div>
+      <div class="core"></div>
+      <div class="s1-portrait"></div>
+    </div>
+
+    <!-- SCENE 2: lines + 4 cards -->
+    <div class="scene scene-2">
+      <svg class="s2-svg" viewBox="0 0 1680 945" preserveAspectRatio="none">
+        <line x1="840" y1="472" x2="290" y2="285"/>
+        <line x1="840" y1="472" x2="1390" y2="285"/>
+        <line x1="840" y1="472" x2="290" y2="660"/>
+        <line x1="840" y1="472" x2="1390" y2="660"/>
+      </svg>
+      <div class="s2-center"></div>
+      <div class="s2-card s2-card-1">
+        <div class="s2-cic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div class="s2-clbl">01 — Strategy</div>
+        <div class="s2-ctit">Proposal Development</div>
+        <div class="s2-cbar"></div><div class="s2-cbar"></div><div class="s2-cbar s"></div>
+      </div>
+      <div class="s2-card s2-card-2">
+        <div class="s2-cic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div class="s2-clbl">02 — Build</div>
+        <div class="s2-ctit">Software Services</div>
+        <div class="s2-cbar"></div><div class="s2-cbar"></div><div class="s2-cbar s"></div>
+      </div>
+      <div class="s2-card s2-card-3">
+        <div class="s2-cic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+        <div class="s2-clbl">03 — People</div>
+        <div class="s2-ctit">Recruitment & Staffing</div>
+        <div class="s2-cbar"></div><div class="s2-cbar"></div><div class="s2-cbar s"></div>
+      </div>
+      <div class="s2-card s2-card-4">
+        <div class="s2-cic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+        <div class="s2-clbl">04 — Support</div>
+        <div class="s2-ctit">Help Desk</div>
+        <div class="s2-cbar"></div><div class="s2-cbar"></div><div class="s2-cbar s"></div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: orbital -->
+    <div class="scene scene-3">
+      <div class="orbit">
+        <div class="orbiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><path d="M14 2v6h6"/></svg></div>
+        <div class="orbiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div class="orbiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-8 8-8s8 3.6 8 8"/></svg></div>
+        <div class="orbiting"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg></div>
+      </div>
+      <div class="orbit orbit-2">
+        <div class="orbit-portrait"></div>
+        <div class="orbit-portrait"></div>
+      </div>
+      <div class="s3-center"></div>
+    </div>
+
+    <!-- SCENE 4: zoom + logomark -->
+    <div class="scene scene-4">
+      <div class="s4-glow"></div>
+      <div class="s4-logomark">
+        <svg viewBox="0 0 100 100" fill="#f5b35a">
+          <circle cx="50" cy="50" r="48" fill="none" stroke="#f5b35a" stroke-width="0.5" opacity="0.3"/>
+          <path d="M50 20 a30 30 0 0 1 26 45 l-8 -5 a20 20 0 0 0 -18 -30 z"/>
+          <path d="M76 65 a30 30 0 0 1 -52 0 l8 -5 a20 20 0 0 0 36 0 z" opacity="0.7"/>
+          <circle cx="50" cy="50" r="6"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- SCENE 5: wordmark -->
+    <div class="scene scene-5">
+      <div class="s5-content">
+        <div class="s5-mark">
+          <svg viewBox="0 0 100 100" fill="#f5b35a">
+            <path d="M50 20 a30 30 0 0 1 26 45 l-8 -5 a20 20 0 0 0 -18 -30 z"/>
+            <path d="M76 65 a30 30 0 0 1 -52 0 l8 -5 a20 20 0 0 0 36 0 z" opacity="0.7"/>
+            <circle cx="50" cy="50" r="6"/>
+          </svg>
+        </div>
+        <div class="s5-logo">Recruit<span>Talent</span></div>
+        <div class="s5-tagline">Talent · Technology · Together</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="hud">
+    Concept B · The Talent Constellation · 22s loop
+    <a href="index.html">← gallery</a>
+  </div>
+</body>
+</html>

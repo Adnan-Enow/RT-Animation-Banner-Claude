@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/SheikhAdnan/.claude/skills/**)",
+      "Read(//c/Users/SheikhAdnan/.claude/plugins/**)",
+      "Bash(npx skills *)",
+      "Bash(ffmpeg -version)",
+      "PowerShell(Get-Command ffmpeg -ErrorAction SilentlyContinue)",
+      "PowerShell(ffprobe -version 2>&1)",
+      "PowerShell(Get-ChildItem \"C:\\\\ProgramData\\\\chocolatey\\\\bin\\\\ffmpeg.exe\" -ErrorAction SilentlyContinue; Get-ChildItem \"C:\\\\ffmpeg\\\\bin\\\\ffmpeg.exe\" -ErrorAction SilentlyContinue; Get-ChildItem \"$env:USERPROFILE\\\\scoop\\\\apps\\\\ffmpeg\" -ErrorAction SilentlyContinue)",
+      "mcp__Claude_in_Chrome__list_connected_browsers",
+      "PowerShell($ffmpeg = \\(Get-Command ffmpeg -ErrorAction SilentlyContinue\\).Source; if \\(-not $ffmpeg\\) { $ffmpeg = \"$env:LOCALAPPDATA\\\\Microsoft\\\\WinGet\\\\Links\\\\ffmpeg.exe\" }; & $ffmpeg -i \"C:\\\\Users\\\\SheikhAdnan\\\\Downloads\\\\Legora-refrence-video-RT.mp4\" 2>&1 | Select-Object -Last 20)",
+      "PowerShell($machinePath = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"Machine\"\\); $userPath = [System.Environment]::GetEnvironmentVariable\\(\"PATH\",\"User\"\\); \\($machinePath + \";\" + $userPath\\) -split ';' | Where-Object { $_ -match \"ffmpeg|gyan|codex\" -or \\(Test-Path \"$_\\\\ffmpeg.exe\" -ErrorAction SilentlyContinue\\) } | Select-Object -Unique)",
+      "Bash(npx --version)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npx create-video@latest --yes --blank --no-tailwind remotion-banner)",
+      "Bash(npm install *)",
+      "Bash(npx remotion *)",
+      "Bash(npm run *)"
+    ]
+  }
+}

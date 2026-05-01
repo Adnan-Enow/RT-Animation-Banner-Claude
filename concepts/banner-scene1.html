@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>RecruitTalent · Banner — Scene 1: Proposal Development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { background: #0a0a0a; display: grid; place-items: center; }
+
+  /* === STAGE: 1452 × 709 === */
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    max-width: 1452px; max-height: 709px;
+    aspect-ratio: 1452 / 709;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  /* === GRADIENT MESH BLOBS (preserved) === */
+  .blobs { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+  .blobs svg { position: absolute; width: 100%; height: 100%; }
+
+  /* === GRID LINES (preserved) === */
+  .grid { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .grid svg { width: 100%; height: 100%; display: block; }
+
+  /* === GLASS CARD (preserved geometry from SVG) === */
+  .card {
+    position: absolute;
+    /* SVG: x=537 y=154 w=378 h=401  on canvas 1452x709 */
+    left: 36.98%;       /* 537/1452 */
+    top: 21.72%;        /* 154/709 */
+    width: 26.03%;      /* 378/1452 */
+    height: 56.56%;     /* 401/709 */
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(4.41px);
+    -webkit-backdrop-filter: blur(4.41px);
+    border: 0.76px solid rgba(255,255,255,0.45);
+    z-index: 2;
+    overflow: hidden;
+  }
+  .card::before {
+    /* gradient border like the SVG paint0_linear */
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.71), rgba(255,255,255,0));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    padding: 0.76px;
+    pointer-events: none;
+  }
+
+  /* Inner placeholder: SVG x=555 y=182 w=343 h=287 (relative to card 537,154) */
+  .placeholder {
+    position: absolute;
+    left: 4.76%;        /* 18/378  */
+    top: 6.98%;         /* 28/401  */
+    width: 90.74%;      /* 343/378 */
+    height: 71.57%;     /* 287/401 */
+    background: rgba(255,255,255,0.19);
+    overflow: hidden;
+  }
+
+  /* === CHAT INPUT — exact positions from your SVG === */
+
+  /* Divider line: SVG y=510.908 (relative to card-top 154 = 356.908) */
+  .chat-divider {
+    position: absolute;
+    left: 4.76%; right: 4.65%;
+    top: 89.00%;  /* 356.908 / 401 */
+    height: 0.58px;
+    background: #f3f3f3;
+    opacity: 0.6;
+  }
+
+  /* Chat text: SVG x≈556.82 y≈489.79–501  (relative ~19.82, 335.79) */
+  .chat-text {
+    position: absolute;
+    left: 5.24%;        /* 19.82/378 */
+    top: 83.74%;        /* 335.79/401 */
+    font-size: 11.5px;
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+  }
+
+  /* + button: SVG cx=564.5 cy=530.326 r=9.5  (relative cx=27.5, cy=376.33) */
+  .chat-add {
+    position: absolute;
+    left: 7.28%;        /* 27.5/378 */
+    top: 93.85%;        /* 376.33/401 */
+    transform: translate(-50%, -50%);
+    width: 19px; height: 19px;
+    border-radius: 50%;
+    background: #fff;
+    display: grid; place-items: center;
+  }
+  .chat-add svg { width: 11px; height: 11px; display: block; }
+
+  /* Send arrow: SVG center ~x=887.5 y=530  (relative cx=350.5, cy=376) */
+  .chat-send {
+    position: absolute;
+    left: 92.72%;       /* 350.5/378 */
+    top: 93.77%;        /* 376/401   */
+    transform: translate(-50%, -50%);
+    width: 19px; height: 19px;
+  }
+  .chat-send svg { width: 100%; height: 100%; display: block; }
+
+  /* ============================================ */
+  /* SCENE 1 — PROPOSAL DEVELOPMENT (UI components) */
+  /* ============================================ */
+
+  .s1 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    color: #fff;
+  }
+
+  /* Top: tab selector */
+  .s1-tabs {
+    display: flex; align-items: center;
+    gap: 4px;
+    padding: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 7px;
+    width: fit-content;
+    opacity: 0;
+    animation: fade-in 0.4s ease-out 0.2s forwards;
+  }
+  .s1-tab {
+    padding: 4px 9px;
+    font-size: 9px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    color: rgba(255,255,255,0.65);
+    border-radius: 5px;
+    transition: all 0.3s;
+  }
+  .s1-tab.active {
+    background: rgba(255,255,255,0.92);
+    color: #1a1a1a;
+    font-weight: 600;
+  }
+
+  .s1-meta-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+    opacity: 0;
+    animation: fade-in 0.4s ease-out 0.4s forwards;
+  }
+  .s1-meta-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    background: rgba(51,98,243,0.7);
+    border-radius: 999px;
+    color: #fff;
+    letter-spacing: 0.08em;
+    font-size: 7.5px;
+    font-weight: 600;
+  }
+  .s1-meta-badge::before {
+    content: ''; width: 4px; height: 4px;
+    border-radius: 50%; background: #fff;
+    animation: pulse 1.4s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.35; }
+  }
+
+  /* Title */
+  .s1-title {
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #fff;
+    line-height: 1.2;
+    opacity: 0;
+    animation: fade-in 0.5s ease-out 0.6s forwards;
+  }
+
+  /* Section cards (UI components) */
+  .s1-sections {
+    display: flex; flex-direction: column;
+    gap: 5px;
+    margin-top: 2px;
+  }
+  .s1-section {
+    display: grid;
+    grid-template-columns: 12px 18px 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transform: translateY(6px);
+    animation: card-in 0.4s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .s1-section:nth-child(1) { animation-delay: 0.9s; }
+  .s1-section:nth-child(2) { animation-delay: 1.05s; }
+  .s1-section:nth-child(3) { animation-delay: 1.20s; }
+  .s1-section:nth-child(4) { animation-delay: 1.35s; }
+  @keyframes card-in {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .s1-drag {
+    display: flex; flex-direction: column; gap: 1.5px;
+    color: rgba(255,255,255,0.4);
+  }
+  .s1-drag span {
+    width: 8px; height: 1px; background: currentColor; border-radius: 1px;
+    display: block;
+  }
+
+  .s1-num {
+    font-family: 'Inter', sans-serif;
+    font-feature-settings: "tnum";
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #ADC0FA;
+    letter-spacing: 0.04em;
+  }
+
+  .s1-name {
+    font-size: 10px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.95);
+    letter-spacing: -0.005em;
+  }
+
+  .s1-status {
+    font-size: 7.5px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 2px 6px;
+    border-radius: 999px;
+    background: rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.7);
+  }
+  .s1-status.review { background: rgba(205,176,255,0.25); color: #E5D6FF; }
+  .s1-status.done   { background: #3362F3; color: #fff; }
+
+  .s1-pages {
+    font-feature-settings: "tnum";
+    font-size: 9px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.55);
+  }
+
+  /* Status state changes — sequential */
+  .s1-section:nth-child(1) .s1-status {
+    animation: to-done 0.35s ease-out 2.2s forwards;
+  }
+  .s1-section:nth-child(2) .s1-status {
+    animation: to-done 0.35s ease-out 2.5s forwards;
+  }
+  .s1-section:nth-child(3) .s1-status {
+    animation: to-review 0.35s ease-out 2.8s forwards;
+  }
+  @keyframes to-done {
+    to { background: #3362F3; color: #fff; }
+  }
+  @keyframes to-review {
+    to { background: rgba(205,176,255,0.28); color: #E5D6FF; }
+  }
+
+  /* Bottom: action bar */
+  .s1-action {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center;
+    gap: 8px;
+    margin-top: auto;
+    padding: 7px 8px;
+    background: rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    transform: translateY(6px);
+    animation: card-in 0.4s cubic-bezier(.22,1,.36,1) 1.6s forwards;
+  }
+  .s1-stat-l {
+    font-size: 7px;
+    text-transform: uppercase;
+    letter-spacing: 0.13em;
+    color: rgba(255,255,255,0.5);
+    margin-bottom: 1px;
+    font-weight: 600;
+  }
+  .s1-stat-v {
+    font-size: 12px;
+    font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.01em;
+    font-feature-settings: "tnum";
+  }
+  .s1-stat-v .accent { color: #ADC0FA; font-weight: 600; }
+  .s1-cta {
+    background: #fff;
+    color: #1a1a1a;
+    font-size: 9px;
+    font-weight: 700;
+    padding: 6px 11px;
+    border-radius: 4px;
+    letter-spacing: 0.01em;
+    display: inline-flex; align-items: center; gap: 5px;
+    animation: cta-pulse 2s ease-in-out 2.4s infinite;
+  }
+  .s1-cta svg { width: 9px; height: 9px; }
+  @keyframes cta-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    50% { box-shadow: 0 0 0 4px rgba(255,255,255,0.18); }
+  }
+
+  /* AI scan overlay */
+  .s1-scan {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+  }
+  .s1-scan::before {
+    content: '';
+    position: absolute;
+    left: -10%; right: -10%;
+    height: 60px;
+    background: linear-gradient(180deg,
+      transparent,
+      rgba(173,192,250,0.18) 40%,
+      rgba(51,98,243,0.25) 50%,
+      rgba(173,192,250,0.18) 60%,
+      transparent);
+    top: -60px;
+    animation: scan 4s ease-in-out 0.5s infinite;
+    filter: blur(2px);
+  }
+  @keyframes scan {
+    0% { top: -60px; opacity: 0; }
+    15% { opacity: 1; }
+    85% { opacity: 1; }
+    100% { top: 110%; opacity: 0; }
+  }
+
+  @keyframes fade-in { to { opacity: 1; } }
+
+  /* HUD */
+  .hud {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.78); color: #fff; backdrop-filter: blur(10px);
+    padding: 8px 16px; border-radius: 999px; font-size: 12px;
+    z-index: 100; display: flex; gap: 16px; align-items: center;
+  }
+  .hud strong { color: #ADC0FA; }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <!-- BACKGROUND BLOBS (preserved) -->
+    <div class="blobs">
+      <svg viewBox="0 0 1452 709" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <filter id="b1" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+          <filter id="b2" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+          <filter id="b3" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+        </defs>
+        <g filter="url(#b1)"><path d="M154.182 311.787C-10.8918 250.71 -133.683 497.9 -136 510H1481.72C1485.77 353.273 1482.53 57.4518 1437.12 127.979C1380.36 216.137 1178.79 61.7157 1075.12 39.8201C971.439 17.9245 860.811 198.852 666.778 299.111C472.744 399.369 319.255 372.864 154.182 311.787Z" fill="#ADC0FA"/></g>
+        <g filter="url(#b2)"><path d="M154.182 421.787C-10.8918 360.71 -133.683 607.9 -136 620H1481.72C1485.77 463.273 1482.53 167.452 1437.12 237.979C1380.36 326.137 1178.79 171.716 1075.12 149.82C971.439 127.924 860.811 308.852 666.778 409.111C472.744 509.369 319.255 482.864 154.182 421.787Z" fill="#CDB0FF"/></g>
+        <g filter="url(#b3)"><path d="M214.182 511.787C49.1082 450.71 -73.6832 697.9 -76 710H1541.72C1545.77 553.273 1542.53 257.452 1497.12 327.979C1440.36 416.137 1238.79 261.716 1135.12 239.82C1031.44 217.924 920.811 398.852 726.778 499.111C532.744 599.37 379.255 572.864 214.182 511.787Z" fill="#3362F3"/></g>
+      </svg>
+    </div>
+
+    <!-- GRID LINES (preserved) -->
+    <div class="grid">
+      <svg viewBox="0 0 1452 709" preserveAspectRatio="none">
+        <line x1="0" y1="637.5" x2="1451" y2="637.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="915.5" y1="10" x2="915.5" y2="720" stroke="white" stroke-opacity="0.33"/>
+        <line x1="537.5" y1="10" x2="537.5" y2="720" stroke="white" stroke-opacity="0.33"/>
+        <line x1="99.5" y1="0" x2="99.5" y2="710" stroke="white" stroke-opacity="0.33"/>
+        <line x1="1392.5" y1="0" x2="1392.5" y2="710" stroke="white" stroke-opacity="0.33"/>
+        <line x1="15" y1="554.5" x2="1466" y2="554.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="0" y1="153.5" x2="1451" y2="153.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="-7" y1="69.5" x2="1444" y2="69.5" stroke="white" stroke-opacity="0.33"/>
+      </svg>
+    </div>
+
+    <!-- GLASS CARD -->
+    <div class="card">
+
+      <!-- Animated placeholder -->
+      <div class="placeholder">
+        <div class="s1" id="s1-mount">
+
+          <div class="s1-meta-row">
+            <div class="s1-tabs">
+              <div class="s1-tab active">Outline</div>
+              <div class="s1-tab">Content</div>
+              <div class="s1-tab">Review</div>
+            </div>
+            <span class="s1-meta-badge">Drafting</span>
+          </div>
+
+          <div class="s1-title">Acme — Banking Modernization</div>
+
+          <div class="s1-sections">
+            <div class="s1-section">
+              <span class="s1-drag"><span></span><span></span><span></span></span>
+              <span class="s1-num">01</span>
+              <span class="s1-name">Executive Summary</span>
+              <span class="s1-status">Draft</span>
+              <span class="s1-pages">2p</span>
+            </div>
+            <div class="s1-section">
+              <span class="s1-drag"><span></span><span></span><span></span></span>
+              <span class="s1-num">02</span>
+              <span class="s1-name">Approach &amp; Methodology</span>
+              <span class="s1-status">Draft</span>
+              <span class="s1-pages">6p</span>
+            </div>
+            <div class="s1-section">
+              <span class="s1-drag"><span></span><span></span><span></span></span>
+              <span class="s1-num">03</span>
+              <span class="s1-name">Team &amp; Capabilities</span>
+              <span class="s1-status">Draft</span>
+              <span class="s1-pages">4p</span>
+            </div>
+            <div class="s1-section">
+              <span class="s1-drag"><span></span><span></span><span></span></span>
+              <span class="s1-num">04</span>
+              <span class="s1-name">Investment &amp; Timeline</span>
+              <span class="s1-status">Draft</span>
+              <span class="s1-pages">3p</span>
+            </div>
+          </div>
+
+          <div class="s1-action">
+            <div>
+              <div class="s1-stat-l">Investment</div>
+              <div class="s1-stat-v"><span class="accent">$</span>284k</div>
+            </div>
+            <div>
+              <div class="s1-stat-l">Duration</div>
+              <div class="s1-stat-v">12 wks</div>
+            </div>
+            <div class="s1-cta">
+              Generate
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+
+          <div class="s1-scan"></div>
+        </div>
+      </div>
+
+      <!-- CHAT INPUT — alignment exactly per your SVG -->
+      <div class="chat-text">Best at proposal development</div>
+      <div class="chat-divider"></div>
+      <div class="chat-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <div class="chat-send">
+        <svg viewBox="0 0 24 24" fill="white">
+          <path d="M19.5 3.2c1.7-.5 3.3 1.1 2.8 2.8L20 14.7c-.4 1.7-2.4 2.4-3.8 1.3L9 9.5c-1.4-1.1-.8-3.3 1-3.8L19.5 3.2z" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="hud">
+    <strong>Banner · Scene 1</strong> · Proposal Development · 6s loop
+  </div>
+
+  <script>
+    // Restart the scene every 6 seconds for clean looping
+    const mount = document.getElementById('s1-mount');
+    const html = mount.innerHTML;
+    setInterval(() => {
+      mount.innerHTML = '';
+      void mount.offsetHeight;
+      mount.innerHTML = html;
+    }, 6000);
+  </script>
+</body>
+</html>
