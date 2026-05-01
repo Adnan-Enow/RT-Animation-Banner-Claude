@@ -16,7 +16,11 @@
       "Bash(npx create-video@latest --yes --blank --no-tailwind remotion-banner)",
       "Bash(npm install *)",
       "Bash(npx remotion *)",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(mkdir -p \"/c/RT - Claude/.claude/skills\")",
+      "Bash(cp -r \"/c/Users/SheikhAdnan/.claude/skills/remotion-best-practices\" \"/c/RT - Claude/.claude/skills/\")",
+      "Bash(mkdir -p \"/c/RT - Claude/remotion-banner/.claude/skills\")",
+      "Bash(cp -r \"/c/RT - Claude/.claude/skills/remotion-best-practices\" \"/c/RT - Claude/remotion-banner/.claude/skills/\")"
     ]
   }
 }
