@@ -20,7 +20,17 @@
       "Bash(mkdir -p \"/c/RT - Claude/.claude/skills\")",
       "Bash(cp -r \"/c/Users/SheikhAdnan/.claude/skills/remotion-best-practices\" \"/c/RT - Claude/.claude/skills/\")",
       "Bash(mkdir -p \"/c/RT - Claude/remotion-banner/.claude/skills\")",
-      "Bash(cp -r \"/c/RT - Claude/.claude/skills/remotion-best-practices\" \"/c/RT - Claude/remotion-banner/.claude/skills/\")"
+      "Bash(cp -r \"/c/RT - Claude/.claude/skills/remotion-best-practices\" \"/c/RT - Claude/remotion-banner/.claude/skills/\")",
+      "Bash(cp \"C:\\\\Users\\\\SheikhAdnan\\\\OneDrive - EnableNow Technology Solutions\\\\Desktop\\\\Banner Animation concept v1.svg\" \"C:\\\\RT - Claude\\\\.claude\\\\worktrees\\\\quirky-hopper-dad5ff\\\\concept-v1.svg\")",
+      "Bash(cp \"C:\\\\Users\\\\SheikhAdnan\\\\OneDrive - EnableNow Technology Solutions\\\\Desktop\\\\Banner Animation concept v2.svg\" \"C:\\\\RT - Claude\\\\.claude\\\\worktrees\\\\quirky-hopper-dad5ff\\\\concept-v2.svg\")",
+      "Read(//c/RT - Claude/.claude/worktrees/**)",
+      "Bash(cp '/c/Users/SheikhAdnan/OneDrive - EnableNow Technology Solutions/Desktop/Banner Animation concept v1.svg' '/c/RT - Claude/.claude/worktrees/quirky-hopper-dad5ff/concept-v1.svg')",
+      "Bash(cp '/c/Users/SheikhAdnan/OneDrive - EnableNow Technology Solutions/Desktop/Banner Animation concept v2.svg' '/c/RT - Claude/.claude/worktrees/quirky-hopper-dad5ff/concept-v2.svg')",
+      "Bash(awk 'NR<=4 || NR>=68 {print NR\": \"substr\\($0,1,200\\)}' '/c/RT - Claude/.claude/worktrees/quirky-hopper-dad5ff/concept-v1.svg')",
+      "Bash(awk '{print NR\": \"length\\($0\\)}' '/c/RT - Claude/.claude/worktrees/quirky-hopper-dad5ff/concept-v1.svg')",
+      "Bash(sort -t: -k2 -n -r)",
+      "Bash(npx create-video@latest --yes --blank --no-tailwind banner-animations)",
+      "Bash(npx tsc *)"
     ]
   }
 }
