@@ -1,0 +1,913 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RecruitTalent · Services Section (v3 — Unified Accordion)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;450;500;600&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  /* =========================================================
+     RecruitTalent — Services Section v3
+     One unified section, all 5 services treated equally.
+     Pattern: horizontal disclosure accordion (one row open at a time)
+       · Hick's Law            — 5 visible at all times, no hidden sub-nav
+       · Common Region         — each row is its own bordered region
+       · Miller's Law          — 3 chips per service (chunked)
+       · Fitts's Law           — entire row is the click target
+       · Jakob's Law           — accordion is a familiar disclosure pattern
+       · Aesthetic-Usability   — soft height transitions, large editorial numerals
+       · Von Restorff          — only the active row uses the dark surface
+       · Serial Position       — numbered 01→05, follows user's stated order
+     ========================================================= */
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    /* Brand tokens — verbatim from Figma */
+    --brand:        #3362F3;
+    --brand-100:    #D6E0FD;
+    --brand-50:     #EEF2FE;
+    --brand-700:    #2547C9;
+
+    --black-600:    #272727;
+    --black-500:    #454545;
+    --black-400:    #8A8A8A;
+    --black-300:    #BABABA;
+    --black-200:    #D8D8D8;
+    --black-100:    #F3F3F3;
+    --white:        #FFFFFF;
+    --surface:      #FFFDFD;
+
+    /* Typography (Suisse Int'l → Inter Tight fallback) */
+    --font-sans:  'Inter Tight', 'Suisse Intl', system-ui, -apple-system, sans-serif;
+    --font-serif: 'Instrument Serif', Georgia, serif;
+
+    --t-xs: 12px; --t-sm: 14px; --t-md: 16px; --t-mdl: 18px;
+    --t-xl: 24px; --t-2xl: 32px; --t-3xl: 48px; --t-4xl: 56px;
+
+    --ease-out:  cubic-bezier(0.16, 1, 0.3, 1);
+    --ease-soft: cubic-bezier(0.32, 0.72, 0, 1);
+
+    --r-md: 14px;
+    --r-lg: 22px;
+    --r-xl: 28px;
+  }
+
+  html, body {
+    background: var(--surface);
+    color: var(--black-600);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+    line-height: 1.5;
+  }
+
+  /* Light page chrome */
+  .stub-nav {
+    position: sticky; top: 0; z-index: 5;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px clamp(20px, 4vw, 56px);
+    background: rgba(255,253,253,0.8);
+    backdrop-filter: saturate(140%) blur(10px);
+    -webkit-backdrop-filter: saturate(140%) blur(10px);
+    border-bottom: 1px solid var(--black-100);
+    font-size: var(--t-sm);
+  }
+  .stub-nav .logo { display: flex; align-items: center; gap: 10px; font-weight: 500; }
+  .stub-nav .logo-mark {
+    width: 22px; height: 22px; border-radius: 6px;
+    background: var(--brand); display: grid; place-items: center;
+    color: #fff; font-weight: 600; font-size: 11px;
+  }
+  .stub-nav nav { display: flex; gap: 22px; color: var(--black-500); }
+  .stub-nav nav a { color: inherit; text-decoration: none; }
+  .stub-nav nav a:hover { color: var(--black-600); }
+  .stub-nav .stub-cta {
+    padding: 8px 14px; border-radius: 999px;
+    background: var(--black-600); color: #fff; text-decoration: none;
+  }
+
+  /* =========================================================
+     SECTION
+     ========================================================= */
+  .services {
+    position: relative;
+    padding: clamp(72px, 9vw, 130px) clamp(20px, 4vw, 56px);
+    overflow: hidden;
+  }
+  .services-inner {
+    max-width: 1456px;
+    margin: 0 auto;
+    position: relative;
+  }
+
+  /* Subtle vertical guide lines (echoes Figma framework grid) */
+  .services::before {
+    content: "";
+    position: absolute; inset: 0;
+    background-image: linear-gradient(to right, rgba(39,39,39,0.04) 1px, transparent 1px);
+    background-size: 56px 100%;
+    mask-image: radial-gradient(ellipse 90% 70% at 50% 30%, #000 30%, transparent 80%);
+    pointer-events: none;
+  }
+
+  /* SECTION HEADER */
+  .head {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    align-items: end;
+    margin-bottom: clamp(36px, 4vw, 56px);
+    position: relative;
+  }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 6px 12px;
+    border: 1px solid var(--black-100);
+    background: var(--white);
+    border-radius: 999px;
+    font-size: var(--t-xs);
+    font-weight: 450;
+    color: var(--black-500);
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .eyebrow .dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    background: var(--brand);
+    box-shadow: 0 0 0 4px rgba(51,98,243,0.15);
+  }
+  .head h2 {
+    margin-top: 16px;
+    font-size: clamp(36px, 4.4vw, 56px);
+    line-height: 1.04;
+    letter-spacing: -0.02em;
+    font-weight: 300;
+    max-width: 560px;
+  }
+  .head h2 em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--black-500);
+  }
+  .head .lead {
+    font-size: var(--t-mdl);
+    color: var(--black-500);
+    max-width: 46ch;
+    margin-left: auto;
+  }
+  @media (max-width: 880px) {
+    .head { grid-template-columns: 1fr; align-items: start; }
+    .head .lead { margin-left: 0; }
+  }
+
+  /* =========================================================
+     ACCORDION
+     ========================================================= */
+  .accordion {
+    border-top: 1px solid var(--black-200);
+    border-radius: 0;
+    overflow: hidden;
+    background: transparent;
+    position: relative;
+  }
+
+  .row {
+    border-bottom: 1px solid var(--black-200);
+    background: var(--surface);
+    transition: background 360ms var(--ease-out);
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* Row trigger — the always-visible "header" for each row */
+  .row-trigger {
+    width: 100%;
+    display: grid;
+    grid-template-columns: 96px 1fr auto;
+    align-items: center;
+    gap: 24px;
+    padding: 26px 28px;
+    background: transparent;
+    border: 0;
+    text-align: left;
+    cursor: pointer;
+    color: inherit;
+    font-family: inherit;
+    transition: padding 360ms var(--ease-out);
+  }
+  .row-trigger:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: -2px;
+  }
+
+  .row-trigger:hover .row-title { color: var(--black-600); }
+  .row-trigger:hover .arrow { color: var(--brand); }
+
+  /* Numeral — small when collapsed, huge when active */
+  .row-num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 28px;
+    color: var(--black-300);
+    line-height: 1;
+    transition:
+      font-size 360ms var(--ease-out),
+      color 360ms ease;
+    letter-spacing: -0.01em;
+  }
+
+  /* Title */
+  .row-title {
+    font-size: var(--t-2xl);
+    font-weight: 300;
+    line-height: 1.15;
+    color: var(--black-500);
+    letter-spacing: -0.015em;
+    transition: color 320ms ease, font-size 360ms var(--ease-out);
+  }
+  @media (max-width: 720px) {
+    .row-title { font-size: var(--t-xl); }
+  }
+
+  /* Tagline (visible only when active) */
+  .row-tagline {
+    grid-column: 2 / 3;
+    margin-top: 8px;
+    font-size: var(--t-md);
+    color: var(--brand-700);
+    font-weight: 450;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 320ms ease, max-height 360ms var(--ease-out), margin-top 360ms var(--ease-out);
+  }
+
+  /* Arrow */
+  .arrow {
+    width: 44px; height: 44px;
+    border-radius: 999px;
+    background: var(--white);
+    border: 1px solid var(--black-100);
+    display: grid; place-items: center;
+    color: var(--black-400);
+    transition: transform 360ms var(--ease-out),
+                background 320ms ease,
+                color 320ms ease,
+                border-color 320ms ease;
+  }
+  .arrow svg { width: 18px; height: 18px; }
+
+  /* Row body — hidden by default, expands when active */
+  .row-body {
+    display: grid;
+    grid-template-columns: 96px 1fr 360px;
+    gap: 24px;
+    padding: 0 28px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition:
+      max-height 520ms var(--ease-out),
+      opacity 320ms ease,
+      padding 360ms var(--ease-out);
+  }
+  .row-body > .body-spacer { /* aligns content under the title column */
+    grid-column: 1 / 2;
+  }
+  .row-body .body-content {
+    grid-column: 2 / 3;
+    padding-bottom: 40px;
+    padding-top: 4px;
+    max-width: 56ch;
+  }
+  .row-body p {
+    color: var(--black-500);
+    font-size: var(--t-mdl);
+    line-height: 1.6;
+    margin-bottom: 22px;
+  }
+  .row-body .chips {
+    display: flex; flex-wrap: wrap; gap: 6px;
+    margin-bottom: 26px;
+  }
+  .row-body .chips span {
+    font-size: var(--t-xs);
+    padding: 7px 12px;
+    border-radius: 999px;
+    background: var(--white);
+    border: 1px solid var(--black-100);
+    color: var(--black-600);
+    font-weight: 450;
+  }
+  .row-body .actions {
+    display: flex; gap: 10px; flex-wrap: wrap;
+  }
+
+  .btn {
+    padding: 11px 18px;
+    border-radius: 999px;
+    font-size: var(--t-sm);
+    font-weight: 500;
+    border: 1px solid var(--black-200);
+    background: var(--white);
+    color: var(--black-600);
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-flex; align-items: center; gap: 8px;
+    transition: background 240ms ease, color 240ms ease, border-color 240ms ease, transform 240ms var(--ease-out);
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn.primary {
+    background: var(--black-600); color: #fff; border-color: var(--black-600);
+  }
+  .btn.primary:hover { background: var(--brand); border-color: var(--brand); }
+  .btn.ghost:hover { border-color: var(--brand); color: var(--brand); }
+
+  /* Visual area on the right of the body */
+  .body-visual {
+    grid-column: 3 / 4;
+    padding-bottom: 40px;
+    padding-top: 4px;
+  }
+  .visual-card {
+    position: relative;
+    border-radius: var(--r-lg);
+    background: var(--brand-100);
+    border: 1px solid rgba(51,98,243,0.10);
+    aspect-ratio: 1.05 / 1;
+    overflow: hidden;
+    isolation: isolate;
+    display: flex;
+    align-items: flex-end;
+    padding: 22px;
+  }
+  .visual-card::before {
+    content: "";
+    position: absolute; inset: -10%;
+    background:
+      radial-gradient(40% 40% at 80% 20%, rgba(255,255,255,0.55), transparent 65%),
+      radial-gradient(45% 45% at 30% 75%, rgba(173,192,250,0.45), transparent 70%),
+      radial-gradient(35% 35% at 90% 90%, rgba(205,176,255,0.30), transparent 70%);
+    filter: blur(20px);
+    z-index: -1;
+  }
+  .visual-num {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    font-size: 180px;
+    line-height: 0.85;
+    color: var(--white);
+    position: absolute;
+    top: 16px;
+    right: 22px;
+    letter-spacing: -0.04em;
+    pointer-events: none;
+    text-shadow: 0 4px 24px rgba(51,98,243,0.18);
+  }
+  .visual-stats {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    display: grid;
+    gap: 8px;
+  }
+  .visual-stat {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: 10px;
+    background: rgba(255,255,255,0.7);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(255,255,255,0.6);
+    font-size: var(--t-sm);
+  }
+  .visual-stat .lbl { color: var(--black-500); }
+  .visual-stat .val {
+    color: var(--black-600);
+    font-weight: 500;
+    font-size: var(--t-md);
+    letter-spacing: -0.01em;
+  }
+  .visual-stat .val em {
+    font-family: var(--font-serif);
+    font-style: italic;
+    font-weight: 400;
+    color: var(--brand);
+  }
+
+  /* ===== ACTIVE state (Von Restorff via tonal shift) ===== */
+  .row.is-active {
+    background: var(--white);
+  }
+  .row.is-active .row-trigger { padding-top: 36px; padding-bottom: 16px; }
+  .row.is-active .row-num {
+    font-size: 56px;
+    color: var(--brand);
+  }
+  .row.is-active .row-title {
+    color: var(--black-600);
+    font-weight: 400;
+    font-size: clamp(28px, 2.8vw, 40px);
+  }
+  .row.is-active .row-tagline {
+    opacity: 1;
+    max-height: 80px;
+    margin-top: 14px;
+  }
+  .row.is-active .arrow {
+    background: var(--black-600);
+    color: #fff;
+    border-color: var(--black-600);
+    transform: rotate(45deg);
+  }
+  .row.is-active .row-body {
+    max-height: 540px;
+    opacity: 1;
+    padding-top: 4px;
+    padding-bottom: 0;
+  }
+
+  /* Responsive: collapse visual on small screens */
+  @media (max-width: 880px) {
+    .row-trigger { grid-template-columns: 64px 1fr auto; padding: 22px 20px; }
+    .row-body { grid-template-columns: 64px 1fr; padding: 0 20px; }
+    .body-visual { display: none; }
+    .row.is-active .row-num { font-size: 40px; }
+    .row.is-active .row-title { font-size: 24px; }
+    .row.is-active .row-body { max-height: 760px; }
+  }
+
+  /* =========================================================
+     NUDGE STRIP (post-accordion)
+     ========================================================= */
+  .nudge {
+    margin-top: 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 24px;
+    padding: 22px 28px;
+    border-radius: var(--r-lg);
+    background: var(--brand-50);
+    border: 1px dashed rgba(51,98,243,0.25);
+  }
+  .nudge .nudge-text {
+    display: flex; align-items: center; gap: 14px;
+    color: var(--black-600); font-size: var(--t-md);
+  }
+  .nudge .nudge-text strong { font-weight: 500; }
+  .nudge .nudge-text .muted { color: var(--black-500); }
+  .nudge-actions { display: flex; gap: 8px; }
+  @media (max-width: 720px) { .nudge { flex-direction: column; align-items: flex-start; } }
+
+  /* Reveal */
+  .reveal { opacity: 0; transform: translateY(14px); }
+  .reveal.in {
+    opacity: 1; transform: none;
+    transition: opacity 700ms var(--ease-out), transform 700ms var(--ease-out);
+  }
+
+  /* Rationale */
+  .legend {
+    margin: 56px auto 0;
+    max-width: 1456px;
+    padding: 24px 28px;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--black-100);
+    background: var(--white);
+    color: var(--black-500);
+    font-size: var(--t-sm);
+    line-height: 1.65;
+  }
+  .legend h4 {
+    color: var(--black-600);
+    font-size: var(--t-md);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+  .legend kbd {
+    font-family: var(--font-sans);
+    background: var(--black-100);
+    border: 1px solid var(--black-200);
+    padding: 1px 6px;
+    border-radius: 4px;
+    color: var(--black-600);
+    font-size: var(--t-xs);
+    font-weight: 500;
+    margin-right: 4px;
+  }
+</style>
+</head>
+<body>
+
+  <header class="stub-nav">
+    <div class="logo">
+      <div class="logo-mark">RT</div>
+      RecruitTalent
+    </div>
+    <nav>
+      <a href="#">About</a>
+      <a href="#">Services</a>
+      <a href="#">Blogs</a>
+      <a href="#">Resources</a>
+    </nav>
+    <a href="#" class="stub-cta">Reach out →</a>
+  </header>
+
+  <section class="services" aria-labelledby="services-heading">
+    <div class="services-inner">
+
+      <!-- HEADER -->
+      <div class="head reveal">
+        <div>
+          <span class="eyebrow"><span class="dot"></span>Our Service Offerings</span>
+          <h2 id="services-heading">
+            Five capabilities, <em>one</em> integrated&nbsp;partner.
+          </h2>
+        </div>
+        <p class="lead">
+          Trusted experts in proposal writing, capture planning, and staffing —
+          built to drive growth in government contracting and beyond.
+          Click any service to see how we deliver.
+        </p>
+      </div>
+
+      <!-- ACCORDION -->
+      <div class="accordion reveal" role="tablist" aria-label="Services">
+
+        <!-- 01 — Proposal Development & Lifecycle Management (default open) -->
+        <div class="row is-active" data-row>
+          <button class="row-trigger" type="button"
+                  aria-expanded="true"
+                  aria-controls="body-01">
+            <span class="row-num">01</span>
+            <span>
+              <span class="row-title">Proposal Development &amp; Lifecycle Management</span>
+              <span class="row-tagline">Win more opportunities with structured, high-quality proposal execution.</span>
+            </span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="row-body" id="body-01" role="tabpanel">
+            <div class="body-spacer"></div>
+            <div class="body-content">
+              <p>
+                We support the full proposal lifecycle — from opportunity qualification and
+                capture alignment to writing, compliance, and submission — helping government
+                contractors improve win rates and reduce execution risk.
+              </p>
+              <div class="chips">
+                <span>RFP response</span>
+                <span>Capture planning</span>
+                <span>Compliance review</span>
+                <span>Pricing strategy</span>
+              </div>
+              <div class="actions">
+                <a href="#" class="btn primary">Explore proposal services
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#" class="btn ghost">View win-rate stats</a>
+              </div>
+            </div>
+            <div class="body-visual">
+              <div class="visual-card">
+                <span class="visual-num">01</span>
+                <div class="visual-stats">
+                  <div class="visual-stat"><span class="lbl">Average win rate</span><span class="val"><em>38</em>%</span></div>
+                  <div class="visual-stat"><span class="lbl">RFPs delivered (2024)</span><span class="val">240<em>+</em></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02 — IT Services & Consulting -->
+        <div class="row" data-row>
+          <button class="row-trigger" type="button"
+                  aria-expanded="false"
+                  aria-controls="body-02">
+            <span class="row-num">02</span>
+            <span>
+              <span class="row-title">IT Services &amp; Consulting</span>
+              <span class="row-tagline">Turn technology into a strategic advantage.</span>
+            </span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="row-body" id="body-02" role="tabpanel">
+            <div class="body-spacer"></div>
+            <div class="body-content">
+              <p>
+                We align IT strategy with business priorities — modernizing systems, strengthening
+                security, and improving operational efficiency so your technology accelerates
+                outcomes instead of slowing them.
+              </p>
+              <div class="chips">
+                <span>Cloud strategy</span>
+                <span>Cybersecurity</span>
+                <span>Data &amp; AI</span>
+                <span>IT modernization</span>
+              </div>
+              <div class="actions">
+                <a href="#" class="btn primary">Explore IT services
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#" class="btn ghost">See engagement models</a>
+              </div>
+            </div>
+            <div class="body-visual">
+              <div class="visual-card">
+                <span class="visual-num">02</span>
+                <div class="visual-stats">
+                  <div class="visual-stat"><span class="lbl">Avg. cost reduction</span><span class="val"><em>32</em>%</span></div>
+                  <div class="visual-stat"><span class="lbl">Cleared engineers</span><span class="val">180<em>+</em></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03 — Application Development & Project Solutions -->
+        <div class="row" data-row>
+          <button class="row-trigger" type="button"
+                  aria-expanded="false"
+                  aria-controls="body-03">
+            <span class="row-num">03</span>
+            <span>
+              <span class="row-title">Application Development &amp; Project Solutions</span>
+              <span class="row-tagline">Build, modernize, and scale digital solutions with confidence.</span>
+            </span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="row-body" id="body-03" role="tabpanel">
+            <div class="body-spacer"></div>
+            <div class="body-content">
+              <p>
+                We design and deliver applications that accelerate execution, improve performance,
+                and support long-term business growth — from greenfield product builds to
+                modernizing legacy estates.
+              </p>
+              <div class="chips">
+                <span>Custom apps</span>
+                <span>Modernization</span>
+                <span>API &amp; integrations</span>
+                <span>UX &amp; design systems</span>
+              </div>
+              <div class="actions">
+                <a href="#" class="btn primary">Explore app services
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#" class="btn ghost">View case studies</a>
+              </div>
+            </div>
+            <div class="body-visual">
+              <div class="visual-card">
+                <span class="visual-num">03</span>
+                <div class="visual-stats">
+                  <div class="visual-stat"><span class="lbl">Time-to-MVP</span><span class="val"><em>8</em> weeks</span></div>
+                  <div class="visual-stat"><span class="lbl">Deployments / yr</span><span class="val">120<em>+</em></span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 — Managed Services & Team Augmentation -->
+        <div class="row" data-row>
+          <button class="row-trigger" type="button"
+                  aria-expanded="false"
+                  aria-controls="body-04">
+            <span class="row-num">04</span>
+            <span>
+              <span class="row-title">Managed Services &amp; Team Augmentation</span>
+              <span class="row-tagline">Extend your capabilities without increasing internal strain.</span>
+            </span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="row-body" id="body-04" role="tabpanel">
+            <div class="body-spacer"></div>
+            <div class="body-content">
+              <p>
+                Managed support and dedicated teams that operate seamlessly within your
+                organization — ensuring continuity, scalability, and measurable performance
+                against the SLAs that matter to your business.
+              </p>
+              <div class="chips">
+                <span>Dedicated pods</span>
+                <span>24/7 support</span>
+                <span>SLA-backed</span>
+                <span>Capacity-on-demand</span>
+              </div>
+              <div class="actions">
+                <a href="#" class="btn primary">Explore managed services
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#" class="btn ghost">Compare delivery models</a>
+              </div>
+            </div>
+            <div class="body-visual">
+              <div class="visual-card">
+                <span class="visual-num">04</span>
+                <div class="visual-stats">
+                  <div class="visual-stat"><span class="lbl">SLA met</span><span class="val"><em>99.6</em>%</span></div>
+                  <div class="visual-stat"><span class="lbl">Avg. ramp-up</span><span class="val"><em>10</em> days</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 — Staffing & Talent Solutions -->
+        <div class="row" data-row>
+          <button class="row-trigger" type="button"
+                  aria-expanded="false"
+                  aria-controls="body-05">
+            <span class="row-num">05</span>
+            <span>
+              <span class="row-title">Staffing &amp; Talent Solutions</span>
+              <span class="row-tagline">Access the right talent at the right time to maintain momentum.</span>
+            </span>
+            <span class="arrow" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+            </span>
+          </button>
+
+          <div class="row-body" id="body-05" role="tabpanel">
+            <div class="body-spacer"></div>
+            <div class="body-content">
+              <p>
+                We help organizations secure high-impact professionals and build scalable teams
+                to support delivery, transformation, and growth — from cleared talent to
+                executive search.
+              </p>
+              <div class="chips">
+                <span>Cleared talent</span>
+                <span>Direct placement</span>
+                <span>Executive search</span>
+                <span>RPO</span>
+              </div>
+              <div class="actions">
+                <a href="#" class="btn primary">Explore staffing
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+                </a>
+                <a href="#" class="btn ghost">Meet our recruiters</a>
+              </div>
+            </div>
+            <div class="body-visual">
+              <div class="visual-card">
+                <span class="visual-num">05</span>
+                <div class="visual-stats">
+                  <div class="visual-stat"><span class="lbl">Avg. shortlist</span><span class="val"><em>5</em> days</span></div>
+                  <div class="visual-stat"><span class="lbl">12-month retention</span><span class="val"><em>94</em>%</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /accordion -->
+
+      <!-- NUDGE -->
+      <div class="nudge reveal" role="region" aria-label="Help choosing a service">
+        <div class="nudge-text">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#3362F3" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="12" cy="12" r="10"/>
+            <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <div>
+            <strong>Need more than one of these?</strong>
+            <span class="muted"> &nbsp;Most engagements span 2–3 services. Tell us your goal and we'll route you to the right team within a day.</span>
+          </div>
+        </div>
+        <div class="nudge-actions">
+          <a href="#" class="btn ghost">Compare services</a>
+          <a href="#" class="btn primary">
+            Get matched
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 12h14"/><path d="M13 5l7 7-7 7"/>
+            </svg>
+          </a>
+        </div>
+      </div>
+
+    </div><!-- /services-inner -->
+  </section>
+
+  <!-- DESIGN RATIONALE -->
+  <aside class="legend">
+    <h4>Design rationale — v3 (unified accordion)</h4>
+    <p>
+      <kbd>Single section</kbd>All 5 services live in one container — no separate "Other Services" or featured-card split.
+      <kbd>Hick's Law</kbd>Five rows visible at once; cognitive load stays manageable because only one is expanded at a time.
+      <kbd>Common Region</kbd>Each service is a clearly bordered row; the active row gets a tonal lift (white over off-white).
+      <kbd>Miller's Law</kbd>Each expanded body chunks deliverables into 4 chips and 2 KPIs.
+      <kbd>Fitts's Law</kbd>The whole row trigger (full width × 96px) is the click target, well above WCAG minimums.
+      <kbd>Jakob's Law</kbd>Disclosure accordion is a familiar pattern (Linear, Apple, Stripe, Anthropic).
+      <kbd>Aesthetic-Usability</kbd>Italic <em>Instrument Serif</em> numerals — small when collapsed (28px), 56px when active, 180px in the visual card — give the section editorial rhythm without breaking the Suisse Int'l type system.
+      <kbd>Von Restorff Effect</kbd>The active row breaks the pattern (white surface, brand-blue numeral, rotated arrow) so the user always knows where they are.
+      <kbd>Serial Position</kbd>Numbered 01→05 in your stated order; 01 opens by default to anchor the experience.
+      <kbd>Keyboard a11y</kbd>Each trigger is a real <code>&lt;button&gt;</code> with <code>aria-expanded</code> and <code>aria-controls</code>; arrow keys could be wired in if needed.
+    </p>
+  </aside>
+
+<script>
+  // Accordion behavior — click any row to swap which one is expanded.
+  // Keeps exactly one open at all times (radio-style) so the section
+  // never collapses to nothing.
+  const rows = Array.from(document.querySelectorAll('[data-row]'));
+
+  rows.forEach((row) => {
+    const trigger = row.querySelector('.row-trigger');
+    trigger.addEventListener('click', () => {
+      if (row.classList.contains('is-active')) return; // already open
+
+      rows.forEach((r) => {
+        const t = r.querySelector('.row-trigger');
+        if (r === row) {
+          r.classList.add('is-active');
+          t.setAttribute('aria-expanded', 'true');
+        } else {
+          r.classList.remove('is-active');
+          t.setAttribute('aria-expanded', 'false');
+        }
+      });
+    });
+
+    // Keyboard arrow navigation between rows
+    trigger.addEventListener('keydown', (e) => {
+      const idx = rows.indexOf(row);
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        const next = rows[(idx + 1) % rows.length];
+        next.querySelector('.row-trigger').focus();
+        next.querySelector('.row-trigger').click();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        const prev = rows[(idx - 1 + rows.length) % rows.length];
+        prev.querySelector('.row-trigger').focus();
+        prev.querySelector('.row-trigger').click();
+      } else if (e.key === 'Home') {
+        e.preventDefault();
+        rows[0].querySelector('.row-trigger').focus();
+        rows[0].querySelector('.row-trigger').click();
+      } else if (e.key === 'End') {
+        e.preventDefault();
+        rows[rows.length - 1].querySelector('.row-trigger').focus();
+        rows[rows.length - 1].querySelector('.row-trigger').click();
+      }
+    });
+  });
+
+  // Stagger reveal
+  const items = document.querySelectorAll('.reveal');
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const el = entry.target;
+        const delay = parseInt(el.dataset.delay || '0', 10);
+        setTimeout(() => el.classList.add('in'), delay);
+        io.unobserve(el);
+      }
+    });
+  }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+  items.forEach((el, i) => {
+    el.dataset.delay = (i * 90).toString();
+    io.observe(el);
+  });
+</script>
+
+</body>
+</html>
