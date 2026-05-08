@@ -26,24 +26,20 @@
 <rect opacity="0.5" x="545.25" y="141.25" width="352.5" height="41.5" fill="#D4DFFE" stroke="white" stroke-width="0.5"/>
 <rect x="555" y="154" width="105" height="15" rx="2" fill="white"/>
 <rect x="832" y="154" width="53" height="15" rx="2" fill="white"/>
-<rect x="555" y="198" width="330" height="281" rx="2" fill="#F2F2F2"/>
-<rect x="568" y="211" width="304" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="227" width="280" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="660" y="243" width="212" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="259" width="259" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="275" width="307" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="628" y="291" width="244" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="307" width="307" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="603" y="323" width="269" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="339" width="274" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="594" y="355" width="278" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="371" width="294" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="618" y="387" width="254" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="594" y="403" width="278" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="582" y="419" width="290" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="575" y="435" width="163" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565" y="460" width="173" height="8" rx="1" fill="#D8D8D8"/>
-<rect x="565.5" y="207.5" width="53" height="15" rx="2.5" fill="#3362F3" fill-opacity="0.08" stroke="#C3D2FF"/>
+<rect x="652" y="233" width="161" height="215" rx="2" fill="#F2F2F2"/>
+<rect x="662" y="244" width="101" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="260" width="82" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="276" width="133" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="675" y="292" width="128" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="308" width="113" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="324" width="133" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="340" width="126" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="356" width="113" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="372" width="141" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="388" width="97" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="404" width="109" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="662" y="429" width="34" height="8" rx="1" fill="#D8D8D8"/>
+<rect x="660.5" y="241.5" width="54" height="13" rx="2.5" fill="#3362F3" fill-opacity="0.08" stroke="#C3D2FF"/>
 </g>
 <defs>
 <filter id="filter0_f_1897_13597" x="-636.6" y="-399.6" width="2616.2" height="1332.2" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
