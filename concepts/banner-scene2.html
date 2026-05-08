@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>RecruitTalent · Banner — Scene 2: Software Development</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { background: #0a0a0a; display: grid; place-items: center; }
+
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    max-width: 1452px; max-height: 709px;
+    aspect-ratio: 1452 / 709;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .blobs { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+  .blobs svg { position: absolute; width: 100%; height: 100%; }
+  .grid { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .grid svg { width: 100%; height: 100%; display: block; }
+
+  .card {
+    position: absolute;
+    left: 36.98%; top: 21.72%;
+    width: 26.03%; height: 56.56%;
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(4.41px);
+    -webkit-backdrop-filter: blur(4.41px);
+    border: 0.76px solid rgba(255,255,255,0.45);
+    z-index: 2; overflow: hidden;
+  }
+
+  .placeholder {
+    position: absolute;
+    left: 4.76%; top: 6.98%;
+    width: 90.74%; height: 71.57%;
+    background: rgba(255,255,255,0.19);
+    overflow: hidden;
+  }
+
+  /* === CHAT INPUT === */
+  .chat-divider {
+    position: absolute;
+    left: 4.76%; right: 4.65%;
+    top: 89.00%;
+    height: 0.58px;
+    background: #f3f3f3; opacity: 0.6;
+  }
+
+  /* Single-line chat text, naturally baseline-aligned */
+  .chat-text {
+    position: absolute;
+    left: 5.24%; top: 83.74%;
+    font-size: 11.5px;
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: 0.01em;
+    line-height: 14px;
+    white-space: nowrap;
+  }
+  .typing-text {
+    color: #fff;
+    /* inherits everything — sits on the same baseline as "Best at" */
+  }
+  .caret {
+    display: inline-block;
+    width: 1.2px;
+    height: 11px;
+    background: #fff;
+    vertical-align: -1px;
+    margin-left: 1px;
+    animation: blink 0.7s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .chat-add {
+    position: absolute;
+    left: 7.28%; top: 93.85%;
+    transform: translate(-50%, -50%);
+    width: 19px; height: 19px;
+    border-radius: 50%; background: #fff;
+    display: grid; place-items: center;
+  }
+  .chat-add svg { width: 11px; height: 11px; }
+  .chat-send {
+    position: absolute;
+    left: 92.72%; top: 93.77%;
+    transform: translate(-50%, -50%);
+    width: 19px; height: 19px;
+  }
+  .chat-send svg { width: 100%; height: 100%; }
+
+  /* ============================================ */
+  /* PROPOSAL UI                                    */
+  /* ============================================ */
+  .s1 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column;
+    gap: 10px;
+    color: #fff;
+    animation: s1-exit 1.0s cubic-bezier(.4,0,.2,1) 1.5s forwards;
+  }
+  @keyframes s1-exit {
+    to { opacity: 0; transform: translateY(-8px) scale(0.96); filter: blur(4px); }
+  }
+  .s1-meta-row { display: flex; justify-content: space-between; align-items: center; }
+  .s1-tabs {
+    display: flex; gap: 4px; padding: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 7px; width: fit-content;
+  }
+  .s1-tab {
+    padding: 4px 9px; font-size: 9px; font-weight: 500;
+    color: rgba(255,255,255,0.65); border-radius: 5px;
+  }
+  .s1-tab.active { background: rgba(255,255,255,0.92); color: #1a1a1a; font-weight: 600; }
+  .s1-meta-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    background: rgba(51,98,243,0.7);
+    border-radius: 999px; color: #fff;
+    font-size: 7.5px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .s1-meta-badge::before {
+    content: ''; width: 4px; height: 4px;
+    border-radius: 50%; background: #fff;
+  }
+  .s1-title {
+    font-size: 14px; font-weight: 700;
+    color: #fff; line-height: 1.2;
+    letter-spacing: -0.01em;
+  }
+  .s1-sections { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+  .s1-section {
+    display: grid;
+    grid-template-columns: 12px 18px 1fr auto auto;
+    align-items: center; gap: 8px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+  }
+  .s1-drag { display: flex; flex-direction: column; gap: 1.5px; color: rgba(255,255,255,0.4); }
+  .s1-drag span { width: 8px; height: 1px; background: currentColor; display: block; }
+  .s1-num { font-size: 8.5px; font-weight: 600; color: #ADC0FA; }
+  .s1-name { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.95); }
+  .s1-status {
+    font-size: 7.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 2px 6px; border-radius: 999px;
+    background: #3362F3; color: #fff;
+  }
+  .s1-pages { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.55); }
+  .s1-action {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center; gap: 8px;
+    margin-top: auto;
+    padding: 7px 8px;
+    background: rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+  }
+  .s1-stat-l { font-size: 7px; text-transform: uppercase; letter-spacing: 0.13em; color: rgba(255,255,255,0.5); font-weight: 600; }
+  .s1-stat-v { font-size: 12px; font-weight: 700; color: #fff; }
+  .s1-stat-v .accent { color: #ADC0FA; }
+  .s1-cta {
+    background: #fff; color: #1a1a1a;
+    font-size: 9px; font-weight: 700;
+    padding: 6px 11px; border-radius: 4px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .s1-cta svg { width: 9px; height: 9px; }
+
+  /* ============================================ */
+  /* CODE TERMINAL — light-blue glass               */
+  /* ============================================ */
+  .s2 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column;
+    color: #fff;
+    opacity: 0;
+    transform: translateY(8px) scale(0.96);
+    filter: blur(4px);
+    animation: s2-enter 0.8s cubic-bezier(.22,1,.36,1) 3.0s forwards;
+  }
+  @keyframes s2-enter {
+    to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+
+  .ide {
+    flex: 1;
+    display: flex; flex-direction: column;
+    background:
+      linear-gradient(135deg,
+        rgba(173,192,250,0.30) 0%,
+        rgba(205,176,255,0.18) 60%,
+        rgba(51,98,243,0.18) 100%);
+    border: 0.5px solid rgba(255,255,255,0.45);
+    border-radius: 7px;
+    overflow: hidden;
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: 0 6px 18px rgba(51,98,243,0.18);
+    position: relative;
+  }
+  .ide::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 35%);
+    pointer-events: none;
+  }
+
+  .ide-bar {
+    position: relative;
+    display: flex; align-items: center;
+    padding: 6px 9px;
+    background: rgba(255,255,255,0.12);
+    border-bottom: 0.5px solid rgba(255,255,255,0.18);
+    gap: 8px;
+  }
+  .ide-dots { display: flex; gap: 4px; }
+  .ide-dot { width: 7px; height: 7px; border-radius: 50%; box-shadow: inset 0 0 1px rgba(0,0,0,0.15); }
+  .ide-dot.r { background: #ff6b66; }
+  .ide-dot.y { background: #ffc940; }
+  .ide-dot.g { background: #36d268; }
+  .ide-file {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px;
+    color: rgba(255,255,255,0.7);
+    font-weight: 500;
+    margin-left: 4px;
+  }
+  .ide-file .file-active { color: #fff; font-weight: 600; }
+  .ide-status {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 7.5px; font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    opacity: 0;
+    animation: fade-in 0.4s ease-out 6.2s forwards;
+  }
+  .ide-status::before {
+    content: ''; width: 5px; height: 5px;
+    background: #ADC0FA; border-radius: 50%;
+    box-shadow: 0 0 6px rgba(173,192,250,1);
+    animation: ping 1.4s ease-in-out infinite;
+  }
+  @keyframes ping {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .ide-code {
+    position: relative;
+    flex: 1;
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    padding: 9px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px;
+    line-height: 1.55;
+    overflow: hidden;
+  }
+  .ide-gutter {
+    color: rgba(255,255,255,0.4);
+    text-align: right;
+    padding-right: 6px;
+    font-size: 8.5px;
+    user-select: none;
+  }
+  .ide-gutter span { display: block; }
+  .ide-lines { padding-right: 10px; }
+  .ide-line {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    opacity: 0;
+    animation: line-show 0.1s linear forwards;
+  }
+  .ide-line .typed {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    vertical-align: bottom;
+    animation: line-type 0.7s steps(40, end) forwards;
+  }
+  @keyframes line-show { to { opacity: 1; width: 100%; } }
+  @keyframes line-type { to { width: 100%; } }
+
+  .l1 { animation-delay: 4.7s; } .l1 .typed { animation-delay: 4.75s; }
+  .l2 { animation-delay: 5.30s; } .l2 .typed { animation-delay: 5.35s; }
+  .l3 { animation-delay: 5.85s; } .l3 .typed { animation-delay: 5.90s; }
+  .l4 { animation-delay: 6.50s; } .l4 .typed { animation-delay: 6.55s; }
+  .l5 { animation-delay: 7.05s; } .l5 .typed { animation-delay: 7.10s; }
+
+  .ide-line.active {
+    background: linear-gradient(90deg, rgba(51,98,243,0.30), transparent 80%);
+    border-left: 1.5px solid #3362F3;
+    padding-left: 1.5px;
+    margin-left: -1.5px;
+  }
+
+  .kw  { color: #FFFFFF; font-weight: 600; }
+  .fn  { color: #FFE7C0; }
+  .var { color: rgba(255,255,255,0.95); }
+  .str { color: #FFD9A8; }
+  .num { color: #FFE7C0; }
+  .cm  { color: rgba(255,255,255,0.6); font-style: italic; }
+  .pun { color: rgba(255,255,255,0.85); }
+
+  .ide-result {
+    position: relative;
+    border-top: 0.5px solid rgba(255,255,255,0.2);
+    padding: 7px 11px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.10);
+    opacity: 0;
+    animation: result-in 0.5s cubic-bezier(.22,1,.36,1) 7.7s forwards;
+  }
+  @keyframes result-in { to { opacity: 1; } }
+  .result-l {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 8.5px; font-weight: 700;
+    color: #fff;
+  }
+  .result-check {
+    width: 12px; height: 12px;
+    background: #fff;
+    color: #3362F3;
+    border-radius: 50%;
+    display: grid; place-items: center;
+  }
+  .result-check svg { width: 7px; height: 7px; }
+  .result-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.7);
+  }
+  .result-meta .pass { color: #fff; font-weight: 700; }
+
+  @keyframes fade-in { to { opacity: 1; } }
+
+  .hud {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.78); color: #fff; backdrop-filter: blur(10px);
+    padding: 8px 16px; border-radius: 999px; font-size: 12px;
+    z-index: 100; display: flex; gap: 16px; align-items: center;
+  }
+  .hud strong { color: #ADC0FA; }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <!-- BLOBS -->
+    <div class="blobs">
+      <svg viewBox="0 0 1452 709" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <filter id="b1" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+          <filter id="b2" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+          <filter id="b3" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+        </defs>
+        <g filter="url(#b1)"><path d="M154.182 311.787C-10.8918 250.71 -133.683 497.9 -136 510H1481.72C1485.77 353.273 1482.53 57.4518 1437.12 127.979C1380.36 216.137 1178.79 61.7157 1075.12 39.8201C971.439 17.9245 860.811 198.852 666.778 299.111C472.744 399.369 319.255 372.864 154.182 311.787Z" fill="#ADC0FA"/></g>
+        <g filter="url(#b2)"><path d="M154.182 421.787C-10.8918 360.71 -133.683 607.9 -136 620H1481.72C1485.77 463.273 1482.53 167.452 1437.12 237.979C1380.36 326.137 1178.79 171.716 1075.12 149.82C971.439 127.924 860.811 308.852 666.778 409.111C472.744 509.369 319.255 482.864 154.182 421.787Z" fill="#CDB0FF"/></g>
+        <g filter="url(#b3)"><path d="M214.182 511.787C49.1082 450.71 -73.6832 697.9 -76 710H1541.72C1545.77 553.273 1542.53 257.452 1497.12 327.979C1440.36 416.137 1238.79 261.716 1135.12 239.82C1031.44 217.924 920.811 398.852 726.778 499.111C532.744 599.37 379.255 572.864 214.182 511.787Z" fill="#3362F3"/></g>
+      </svg>
+    </div>
+
+    <!-- GRID -->
+    <div class="grid">
+      <svg viewBox="0 0 1452 709" preserveAspectRatio="none">
+        <line x1="0" y1="637.5" x2="1451" y2="637.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="915.5" y1="10" x2="915.5" y2="720" stroke="white" stroke-opacity="0.33"/>
+        <line x1="537.5" y1="10" x2="537.5" y2="720" stroke="white" stroke-opacity="0.33"/>
+        <line x1="99.5" y1="0" x2="99.5" y2="710" stroke="white" stroke-opacity="0.33"/>
+        <line x1="1392.5" y1="0" x2="1392.5" y2="710" stroke="white" stroke-opacity="0.33"/>
+        <line x1="15" y1="554.5" x2="1466" y2="554.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="0" y1="153.5" x2="1451" y2="153.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="-7" y1="69.5" x2="1444" y2="69.5" stroke="white" stroke-opacity="0.33"/>
+      </svg>
+    </div>
+
+    <div class="card">
+
+      <div class="placeholder" id="mount">
+
+        <div class="s1">
+          <div class="s1-meta-row">
+            <div class="s1-tabs">
+              <div class="s1-tab active">Outline</div>
+              <div class="s1-tab">Content</div>
+              <div class="s1-tab">Review</div>
+            </div>
+            <span class="s1-meta-badge">Drafting</span>
+          </div>
+          <div class="s1-title">Acme — Banking Modernization</div>
+          <div class="s1-sections">
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">01</span><span class="s1-name">Executive Summary</span><span class="s1-status">Done</span><span class="s1-pages">2p</span></div>
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">02</span><span class="s1-name">Approach &amp; Methodology</span><span class="s1-status">Done</span><span class="s1-pages">6p</span></div>
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">03</span><span class="s1-name">Team &amp; Capabilities</span><span class="s1-status">Done</span><span class="s1-pages">4p</span></div>
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">04</span><span class="s1-name">Investment &amp; Timeline</span><span class="s1-status">Done</span><span class="s1-pages">3p</span></div>
+          </div>
+          <div class="s1-action">
+            <div><div class="s1-stat-l">Investment</div><div class="s1-stat-v"><span class="accent">$</span>284k</div></div>
+            <div><div class="s1-stat-l">Duration</div><div class="s1-stat-v">12 wks</div></div>
+            <div class="s1-cta">Generate <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+
+        <div class="s2">
+          <div class="ide">
+
+            <div class="ide-bar">
+              <div class="ide-dots">
+                <span class="ide-dot r"></span>
+                <span class="ide-dot y"></span>
+                <span class="ide-dot g"></span>
+              </div>
+              <div class="ide-file">acme-platform / api / <span class="file-active">users.ts</span></div>
+              <div class="ide-status">Build · Ready</div>
+            </div>
+
+            <div class="ide-code">
+              <div class="ide-gutter">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+              </div>
+              <div class="ide-lines">
+                <div class="ide-line l1"><span class="typed"><span class="cm">// API · type-safe</span></span></div>
+                <div class="ide-line l2"><span class="typed"><span class="kw">export const</span> <span class="fn">getUsers</span> <span class="pun">= </span><span class="kw">async</span> <span class="pun">() =&gt; {</span></span></div>
+                <div class="ide-line l3 active"><span class="typed">&nbsp;&nbsp;<span class="kw">const</span> <span class="var">users</span> <span class="pun">= </span><span class="kw">await</span> <span class="var">db</span><span class="pun">.</span><span class="fn">query</span><span class="pun">(</span><span class="str">'users'</span><span class="pun">)</span></span></div>
+                <div class="ide-line l4"><span class="typed">&nbsp;&nbsp;<span class="kw">return</span> <span class="var">users</span><span class="pun">.</span><span class="fn">map</span><span class="pun">(</span><span class="fn">serialize</span><span class="pun">)</span></span></div>
+                <div class="ide-line l5"><span class="typed"><span class="pun">}</span></span></div>
+              </div>
+            </div>
+
+            <div class="ide-result">
+              <div class="result-l">
+                <div class="result-check">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                24 / 24 tests passing
+              </div>
+              <div class="result-meta"><span class="pass">2.3s</span> · coverage 94%</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CHAT INPUT — single inline span, naturally aligned -->
+      <div class="chat-text">Best at <span class="typing-text" id="typer">proposal development</span><span class="caret"></span></div>
+      <div class="chat-divider"></div>
+      <div class="chat-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <div class="chat-send">
+        <svg viewBox="0 0 24 24" fill="white">
+          <path d="M19.5 3.2c1.7-.5 3.3 1.1 2.8 2.8L20 14.7c-.4 1.7-2.4 2.4-3.8 1.3L9 9.5c-1.4-1.1-.8-3.3 1-3.8L19.5 3.2z" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="hud">
+    <strong>Banner · Scene 2</strong> · Software Development · 9s loop
+  </div>
+
+  <script>
+    const mount = document.getElementById('mount');
+    const html = mount.innerHTML;
+    const typer = document.getElementById('typer');
+    const timeouts = [];
+
+    function clearAll() {
+      timeouts.forEach(t => clearTimeout(t));
+      timeouts.length = 0;
+    }
+
+    function eraseText(el, duration, done) {
+      const text = el.textContent;
+      const len = text.length;
+      const step = duration / len;
+      for (let i = 1; i <= len; i++) {
+        timeouts.push(setTimeout(() => {
+          el.textContent = text.slice(0, len - i);
+        }, i * step));
+      }
+      if (done) timeouts.push(setTimeout(done, duration + 30));
+    }
+
+    function typeText(el, text, duration, done) {
+      el.textContent = '';
+      const len = text.length;
+      const step = duration / len;
+      for (let i = 1; i <= len; i++) {
+        timeouts.push(setTimeout(() => {
+          el.textContent = text.slice(0, i);
+        }, i * step));
+      }
+      if (done) timeouts.push(setTimeout(done, duration + 30));
+    }
+
+    function start() {
+      clearAll();
+
+      // 1. Reset placeholder UI animations
+      mount.innerHTML = '';
+      void mount.offsetHeight;
+      mount.innerHTML = html;
+
+      // 2. Reset chat text to "proposal development"
+      typer.textContent = 'proposal development';
+
+      // 3. At 1.5s, start erasing
+      timeouts.push(setTimeout(() => {
+        eraseText(typer, 1000);
+      }, 1500));
+
+      // 4. At 3.5s, start typing "software development"
+      timeouts.push(setTimeout(() => {
+        typeText(typer, 'software development', 1000);
+      }, 3500));
+    }
+
+    start();
+    setInterval(start, 9000);
+  </script>
+</body>
+</html>

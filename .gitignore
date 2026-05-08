@@ -1,0 +1,32 @@
+# Dependencies
+node_modules/
+.remotion/
+
+# Remotion build artifacts
+out/
+dist/
+build/
+**/chrome-headless-shell*
+**/chromium*
+
+# Frame stills used during development
+frame-*.png
+test-frame.png
+video_frames/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+
+# Environment
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*

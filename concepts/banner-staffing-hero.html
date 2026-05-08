@@ -1,0 +1,703 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Staffing Hero — Hiring Journey</title>
+<meta name="viewport" content="width=1452, initial-scale=1" />
+<style>
+  /* ─────────────────────────────────────────────
+     Tokens (sourced from Figma + soft SaaS palette)
+     ───────────────────────────────────────────── */
+  :root {
+    --blue-50:  #F4F7FF;
+    --blue-100: #E5ECFE;
+    --blue-200: #ADC0FA;        /* Figma Blue/blue-200 */
+    --blue-500: #3362F3;
+    --blue-600: #2A52D9;
+
+    --ink-900: #0F1115;
+    --ink-700: #1F2330;
+    --ink-500: #454545;         /* Figma Black/black-500 */
+    --ink-400: #6B6F7A;
+    --ink-300: #BABABA;         /* Figma Black/black-300 */
+    --ink-200: #D8D8D8;         /* Figma Black/black-200-a */
+    --ink-100: #F3F3F3;         /* Figma Black/black-100 */
+
+    --ok-500:  #16A34A;
+    --ok-50:   #ECFDF3;
+    --warn-500:#F59E0B;
+
+    --radius-card: 18px;
+    --radius-row:  12px;
+    --radius-pill: 999px;
+
+    --font-body: "Suisse Int'l", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+
+  body {
+    font-family: var(--font-body);
+    color: var(--ink-900);
+    background:
+      radial-gradient(1200px 600px at 18% 12%, #EEF2FF 0%, transparent 60%),
+      radial-gradient(1000px 520px at 88% 88%, #F5F0FF 0%, transparent 60%),
+      linear-gradient(180deg, #FAFBFE 0%, #F5F7FC 100%);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Banner stage matches production 1452×709 ratio */
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+  }
+
+  /* Subtle ambient orbs to give depth without noise */
+  .orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(60px);
+    opacity: .55;
+    pointer-events: none;
+  }
+  .orb.a { width: 520px; height: 520px; left: -120px; top: -160px; background: #DCE5FF; animation: drift 16s ease-in-out infinite alternate; }
+  .orb.b { width: 460px; height: 460px; right: -140px; bottom: -180px; background: #EADBFF; animation: drift 18s ease-in-out infinite alternate-reverse; }
+  @keyframes drift {
+    from { transform: translate3d(0,0,0) scale(1); }
+    to   { transform: translate3d(28px,18px,0) scale(1.05); }
+  }
+
+  /* ─────────────────────────────────────────────
+     Card / Dashboard
+     ───────────────────────────────────────────── */
+  .card {
+    position: relative;
+    width: min(620px, 44vw);
+    background: rgba(255,255,255,0.86);
+    backdrop-filter: blur(14px) saturate(140%);
+    -webkit-backdrop-filter: blur(14px) saturate(140%);
+    border: 1px solid rgba(15,17,21,0.06);
+    border-radius: var(--radius-card);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.9) inset,
+      0 24px 60px -20px rgba(40,60,120,0.18),
+      0 8px 24px -8px rgba(40,60,120,0.10);
+    padding: 18px 18px 16px;
+    animation: card-in 900ms cubic-bezier(.2,.7,.2,1) both;
+  }
+  @keyframes card-in {
+    from { opacity: 0; transform: translateY(14px) scale(.985); filter: blur(6px); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    filter: blur(0); }
+  }
+
+  .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 4px 4px 14px;
+  }
+  .brand {
+    display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600; color: var(--ink-700); letter-spacing: .2px;
+  }
+  .brand .dot {
+    width: 22px; height: 22px; border-radius: 7px;
+    background: linear-gradient(135deg, var(--blue-500) 0%, #6E8BFF 100%);
+    box-shadow: 0 4px 10px -4px rgba(51,98,243,.5);
+    position: relative;
+  }
+  .brand .dot::after{
+    content:""; position:absolute; inset:6px; border-radius:3px;
+    background: rgba(255,255,255,.85);
+  }
+  .crumbs {
+    display: flex; align-items: center; gap: 8px;
+    color: var(--ink-400); font-size: 12px;
+  }
+  .crumbs .chip {
+    padding: 4px 8px; border-radius: var(--radius-pill);
+    background: var(--ink-100); color: var(--ink-500);
+    font-size: 11px; font-weight: 500;
+  }
+
+  /* Search bar */
+  .search {
+    position: relative;
+    display: flex; align-items: center; gap: 10px;
+    padding: 12px 14px;
+    background: #fff;
+    border: 1px solid var(--ink-200);
+    border-radius: 14px;
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset, 0 6px 18px -10px rgba(40,60,120,.14);
+    transition: border-color .4s ease, box-shadow .4s ease;
+  }
+  .search.is-active {
+    border-color: var(--blue-200);
+    box-shadow: 0 0 0 4px rgba(173,192,250,.28), 0 6px 18px -10px rgba(40,60,120,.14);
+  }
+  .search svg { flex: none; color: var(--ink-400); }
+  .search .query {
+    flex: 1;
+    font-size: 14px; color: var(--ink-900); letter-spacing: .1px;
+    min-height: 18px; line-height: 18px;
+    white-space: nowrap; overflow: hidden;
+  }
+  .search .placeholder { color: var(--ink-300); }
+  .caret {
+    display: inline-block; width: 1.5px; height: 14px;
+    background: var(--ink-900); margin-left: 1px; vertical-align: -2px;
+    animation: caret 1s steps(1) infinite;
+  }
+  @keyframes caret { 50% { opacity: 0; } }
+  .search .kbd {
+    font-size: 10.5px; color: var(--ink-400);
+    padding: 3px 6px; border-radius: 6px;
+    background: var(--ink-100); border: 1px solid var(--ink-200);
+  }
+
+  /* Filter row */
+  .filters {
+    display: flex; align-items: center; gap: 8px;
+    padding: 12px 2px 10px;
+    opacity: 0; transform: translateY(4px);
+    animation: fade-up .6s ease both;
+    animation-delay: 2.1s;
+  }
+  .filter {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 6px 10px; border-radius: var(--radius-pill);
+    background: #fff; border: 1px solid var(--ink-200);
+    font-size: 11.5px; color: var(--ink-500);
+  }
+  .filter.active {
+    background: var(--blue-50); border-color: var(--blue-200); color: var(--blue-600);
+  }
+  .filter .x { color: var(--ink-400); font-size: 10px; }
+  .meta {
+    margin-left: auto; font-size: 11.5px; color: var(--ink-400);
+  }
+  .meta b { color: var(--ink-900); font-weight: 600; }
+
+  /* Candidate list */
+  .list {
+    position: relative;
+    display: flex; flex-direction: column; gap: 8px;
+    margin-top: 4px;
+  }
+
+  .row {
+    --row-y: 0px;
+    position: relative;
+    display: grid;
+    grid-template-columns: 40px 1fr auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #fff;
+    border: 1px solid rgba(15,17,21,0.06);
+    border-radius: var(--radius-row);
+    box-shadow: 0 1px 0 rgba(255,255,255,.7) inset, 0 6px 14px -10px rgba(40,60,120,.12);
+    opacity: 0;
+    transform: translateY(8px);
+    max-height: 80px;
+    overflow: hidden;
+    animation: row-in .55s cubic-bezier(.2,.7,.2,1) both;
+    transition:
+      opacity .45s ease,
+      transform .6s cubic-bezier(.2,.7,.2,1),
+      box-shadow .5s ease,
+      border-color .5s ease,
+      filter .45s ease,
+      max-height .55s cubic-bezier(.2,.7,.2,1) .35s,
+      padding .55s cubic-bezier(.2,.7,.2,1) .35s,
+      margin .55s cubic-bezier(.2,.7,.2,1) .35s,
+      border-width .2s ease .35s;
+  }
+  @keyframes row-in {
+    from { opacity: 0; transform: translateY(10px); filter: blur(4px); }
+    to   { opacity: 1; transform: translateY(0);    filter: blur(0); }
+  }
+
+  .row .avatar {
+    width: 40px; height: 40px; border-radius: 50%;
+    display: grid; place-items: center;
+    color: #fff; font-size: 13px; font-weight: 600; letter-spacing: .3px;
+    box-shadow: 0 0 0 2px #fff, 0 6px 14px -6px rgba(40,60,120,.25);
+  }
+  .a-1 { background: linear-gradient(135deg,#3362F3,#6E8BFF); }
+  .a-2 { background: linear-gradient(135deg,#7C5CFF,#B79CFF); }
+  .a-3 { background: linear-gradient(135deg,#0EA5A5,#5EE6D6); }
+  .a-4 { background: linear-gradient(135deg,#F59E0B,#FCD34D); }
+  .a-5 { background: linear-gradient(135deg,#EC4899,#F9A8D4); }
+
+  .who .name {
+    font-size: 13.5px; font-weight: 600; color: var(--ink-900); letter-spacing: .1px;
+    display: inline-flex; align-items: center; gap: 8px;
+  }
+  .who .role {
+    font-size: 11.5px; color: var(--ink-500); margin-top: 2px;
+  }
+
+  .tags { display: flex; gap: 6px; }
+  .tag {
+    font-size: 10.5px; color: var(--ink-500);
+    padding: 3px 8px; border-radius: var(--radius-pill);
+    background: var(--ink-100); border: 1px solid var(--ink-200);
+    white-space: nowrap;
+  }
+  .tag.brand { color: var(--blue-600); background: var(--blue-50); border-color: var(--blue-200); }
+
+  .score {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 9px; border-radius: var(--radius-pill);
+    font-size: 11px; font-weight: 600; color: var(--ink-500);
+    background: var(--ink-100); border: 1px solid var(--ink-200);
+    min-width: 52px; justify-content: center;
+  }
+  .score.high { color: var(--ok-500); background: var(--ok-50); border-color: #C7F0D8; }
+
+  /* Filtering: rows that don't match fade & collapse */
+  .row.filter-out {
+    opacity: 0;
+    transform: translateY(-4px) scale(.98);
+    filter: blur(4px);
+    pointer-events: none;
+    max-height: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: -8px; /* swallow the .list gap */
+    border-width: 0;
+  }
+  .row.filter-out > * { opacity: 0; transition: opacity .25s ease; }
+
+  /* Best match emphasis */
+  .row.best {
+    border-color: var(--blue-200);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.85) inset,
+      0 0 0 4px rgba(173,192,250,.28),
+      0 14px 28px -14px rgba(51,98,243,.35);
+    transform: translateY(0) scale(1.015);
+  }
+  .row.best .who .name { color: var(--ink-900); }
+
+  .badge-top {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px; border-radius: var(--radius-pill);
+    background: var(--blue-500); color: #fff;
+    font-size: 9.5px; font-weight: 600; letter-spacing: .3px;
+    text-transform: uppercase;
+    box-shadow: 0 4px 10px -4px rgba(51,98,243,.5);
+    opacity: 0; transform: translateY(2px) scale(.85);
+    transition: opacity .4s ease, transform .4s cubic-bezier(.2,.7,.2,1);
+    max-width: 0; overflow: hidden;
+    padding-left: 0; padding-right: 0;
+  }
+  .row.best .badge-top {
+    opacity: 1; transform: translateY(0) scale(1);
+    max-width: 90px;
+    padding-left: 7px; padding-right: 7px;
+  }
+
+  /* Hire CTA */
+  .cta-wrap {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-top: 14px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .5s ease, transform .5s cubic-bezier(.2,.7,.2,1);
+  }
+  .cta-wrap.show { opacity: 1; transform: translateY(0); }
+  .summary { font-size: 12px; color: var(--ink-500); }
+  .summary b { color: var(--ink-900); font-weight: 600; }
+
+  .btn {
+    position: relative;
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 10px 16px;
+    background: linear-gradient(180deg, #3362F3 0%, #2A52D9 100%);
+    color: #fff;
+    font-size: 13px; font-weight: 600; letter-spacing: .2px;
+    border: 0; border-radius: 12px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,.25) inset,
+      0 10px 24px -10px rgba(51,98,243,.55);
+    overflow: hidden;
+  }
+  .btn::after {
+    content: "";
+    position: absolute; inset: 0;
+    background: radial-gradient(80px 30px at var(--mx,50%) 50%, rgba(255,255,255,.35), transparent 60%);
+    opacity: 0; transition: opacity .3s ease;
+  }
+  .btn.pulse { animation: btn-pulse 1.6s ease-in-out infinite; }
+  @keyframes btn-pulse {
+    0%, 100% { box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 10px 24px -10px rgba(51,98,243,.55), 0 0 0 0 rgba(51,98,243,.35); }
+    50%      { box-shadow: 0 1px 0 rgba(255,255,255,.25) inset, 0 10px 24px -10px rgba(51,98,243,.55), 0 0 0 8px rgba(51,98,243,0); }
+  }
+  .btn .arrow { transition: transform .35s ease; }
+  .btn:hover .arrow { transform: translateX(2px); }
+
+  /* Cursor that flies to the button */
+  .cursor {
+    position: absolute;
+    left: 24%; top: 28%;
+    width: 18px; height: 18px;
+    pointer-events: none;
+    opacity: 0;
+    transition: transform .9s cubic-bezier(.2,.7,.2,1), opacity .35s ease;
+    filter: drop-shadow(0 4px 10px rgba(0,0,0,.18));
+    z-index: 5;
+  }
+
+  /* Success state overlay */
+  .success {
+    position: absolute; inset: 0;
+    display: grid; place-items: center;
+    background: rgba(255,255,255,0.78);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 0; pointer-events: none;
+    transition: opacity .55s ease;
+    border-radius: var(--radius-card);
+  }
+  .success.show { opacity: 1; }
+
+  .success-card {
+    text-align: center;
+    transform: translateY(8px) scale(.96);
+    transition: transform .6s cubic-bezier(.2,.7,.2,1);
+  }
+  .success.show .success-card { transform: translateY(0) scale(1); }
+
+  .check {
+    width: 54px; height: 54px; margin: 0 auto 10px;
+    border-radius: 50%;
+    background: var(--ok-50);
+    border: 1px solid #C7F0D8;
+    display: grid; place-items: center;
+    position: relative;
+  }
+  .check svg { width: 26px; height: 26px; color: var(--ok-500); }
+  .check::before {
+    content: "";
+    position: absolute; inset: -10px;
+    border-radius: 50%;
+    border: 1px solid rgba(22,163,74,.25);
+    opacity: 0;
+    animation: ring 1.6s ease-out infinite;
+  }
+  .success.show .check::before { animation-play-state: running; }
+  @keyframes ring {
+    0%   { transform: scale(.6); opacity: .8; }
+    100% { transform: scale(1.4); opacity: 0; }
+  }
+
+  .success h3 {
+    margin: 0; font-size: 18px; font-weight: 600; color: var(--ink-900); letter-spacing: -.2px;
+  }
+  .success p {
+    margin: 6px 0 14px; font-size: 12.5px; color: var(--ink-500);
+  }
+  .success .placed {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 8px 12px; border-radius: var(--radius-pill);
+    background: #fff; border: 1px solid var(--ink-200);
+    font-size: 12px; color: var(--ink-700);
+    box-shadow: 0 6px 16px -10px rgba(40,60,120,.18);
+  }
+  .success .placed .av {
+    width: 22px; height: 22px; border-radius: 50%;
+    background: linear-gradient(135deg,#3362F3,#6E8BFF);
+    box-shadow: 0 0 0 2px #fff;
+    display: inline-block;
+  }
+  .success .placed b { color: var(--ink-900); font-weight: 600; }
+  .success .placed .arrow {
+    color: var(--ink-300); margin: 0 2px;
+  }
+  .success .placed .role {
+    color: var(--blue-600); font-weight: 600;
+  }
+
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Tiny HUD */
+  .hud {
+    position: fixed; left: 14px; bottom: 12px;
+    font: 11px/1 var(--font-body);
+    color: var(--ink-400);
+    user-select: none;
+    letter-spacing: .3px;
+  }
+  .hud strong { color: var(--ink-700); font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage">
+    <div class="orb a"></div>
+    <div class="orb b"></div>
+
+    <div class="card" id="card">
+      <!-- Header -->
+      <div class="card-head">
+        <div class="brand">
+          <span class="dot"></span>
+          <span>Recruit Talent</span>
+        </div>
+        <div class="crumbs">
+          <span>Talent Pool</span>
+          <span style="opacity:.5">/</span>
+          <span class="chip">New Search</span>
+        </div>
+      </div>
+
+      <!-- Search -->
+      <div class="search" id="search">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+        <div class="query"><span id="typed"></span><span class="caret" id="caret"></span><span class="placeholder" id="ph">Search role, skill, or keyword…</span></div>
+        <span class="kbd">⌘ K</span>
+      </div>
+
+      <!-- Filter row -->
+      <div class="filters">
+        <span class="filter active">ServiceNow <span class="x">×</span></span>
+        <span class="filter">Senior</span>
+        <span class="filter">Remote</span>
+        <span class="filter">5+ yrs</span>
+        <span class="meta"><b id="count">5</b> candidates</span>
+      </div>
+
+      <!-- Candidate list -->
+      <div class="list" id="list">
+        <div class="row" data-match="92" style="animation-delay:2.4s">
+          <div class="avatar a-1">AR</div>
+          <div class="who">
+            <div class="name">Aarav Rao
+              <span class="badge-top">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.39 7.36H22l-6.18 4.49L18.21 21 12 16.51 5.79 21l2.39-7.15L2 9.36h7.61z"/></svg>
+                Top Match
+              </span>
+            </div>
+            <div class="role">Senior ServiceNow Developer · Bengaluru</div>
+          </div>
+          <div class="tags">
+            <span class="tag brand">ITSM</span>
+            <span class="tag">Flow</span>
+            <span class="tag">Scripted REST</span>
+          </div>
+          <div class="score high">92%</div>
+        </div>
+
+        <div class="row" data-match="88" style="animation-delay:2.55s">
+          <div class="avatar a-2">PS</div>
+          <div class="who">
+            <div class="name">Priya Shah</div>
+            <div class="role">ServiceNow Developer · Pune</div>
+          </div>
+          <div class="tags">
+            <span class="tag brand">CSM</span>
+            <span class="tag">HRSD</span>
+            <span class="tag">JS</span>
+          </div>
+          <div class="score high">88%</div>
+        </div>
+
+        <div class="row" data-match="74" style="animation-delay:2.7s">
+          <div class="avatar a-3">DK</div>
+          <div class="who">
+            <div class="name">Daniel Kim</div>
+            <div class="role">Platform Engineer · Remote</div>
+          </div>
+          <div class="tags">
+            <span class="tag">Salesforce</span>
+            <span class="tag">REST</span>
+          </div>
+          <div class="score">74%</div>
+        </div>
+
+        <div class="row" data-match="61" style="animation-delay:2.85s">
+          <div class="avatar a-4">MN</div>
+          <div class="who">
+            <div class="name">Maya Nair</div>
+            <div class="role">Junior Dev · Hyderabad</div>
+          </div>
+          <div class="tags">
+            <span class="tag">JIRA</span>
+            <span class="tag">SQL</span>
+          </div>
+          <div class="score">61%</div>
+        </div>
+
+        <div class="row" data-match="55" style="animation-delay:3s">
+          <div class="avatar a-5">LO</div>
+          <div class="who">
+            <div class="name">Lina Ortiz</div>
+            <div class="role">QA Engineer · Madrid</div>
+          </div>
+          <div class="tags">
+            <span class="tag">QA</span>
+            <span class="tag">Cypress</span>
+          </div>
+          <div class="score">55%</div>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-wrap" id="ctaWrap">
+        <div class="summary">Best match: <b>Aarav Rao</b> · 92% fit · available in 2 weeks</div>
+        <button class="btn" id="hireBtn">
+          <span>Hire Candidate</span>
+          <svg class="arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M13 5l7 7-7 7"/></svg>
+        </button>
+      </div>
+
+      <!-- Cursor -->
+      <svg class="cursor" id="cursor" viewBox="0 0 20 20" fill="none">
+        <path d="M2 2l5 14 2.5-5.5L15 8 2 2z" fill="#0F1115" stroke="#fff" stroke-width="1.2" stroke-linejoin="round"/>
+      </svg>
+
+      <!-- Success overlay -->
+      <div class="success" id="success">
+        <div class="success-card">
+          <div class="check">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </div>
+          <h3>Candidate Placed</h3>
+          <p>Offer sent · onboarding scheduled</p>
+          <span class="placed">
+            <span class="av"></span>
+            <b>Aarav Rao</b>
+            <span class="arrow">→</span>
+            <span class="role">ServiceNow Developer</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hud"><strong>Staffing Hero</strong> · hiring journey · 10s loop</div>
+
+<script>
+(() => {
+  const TYPE_TEXT = "ServiceNow Developer";
+  const typed   = document.getElementById('typed');
+  const caret   = document.getElementById('caret');
+  const ph      = document.getElementById('ph');
+  const search  = document.getElementById('search');
+  const list    = document.getElementById('list');
+  const count   = document.getElementById('count');
+  const ctaWrap = document.getElementById('ctaWrap');
+  const hireBtn = document.getElementById('hireBtn');
+  const cursor  = document.getElementById('cursor');
+  const success = document.getElementById('success');
+  const card    = document.getElementById('card');
+  const rows    = [...list.querySelectorAll('.row')];
+
+  let timers = [];
+  const after = (ms, fn) => timers.push(setTimeout(fn, ms));
+  const reset = () => {
+    timers.forEach(clearTimeout); timers = [];
+    typed.textContent = "";
+    ph.style.display = "";
+    search.classList.remove('is-active');
+    rows.forEach(r => {
+      r.classList.remove('filter-out','best');
+      r.style.animation = 'none'; void r.offsetWidth; r.style.animation = '';
+    });
+    ctaWrap.classList.remove('show');
+    hireBtn.classList.remove('pulse');
+    success.classList.remove('show');
+    cursor.style.opacity = 0;
+    cursor.style.transform = "translate(0,0)";
+    count.textContent = '5';
+  };
+
+  const typeText = (text, perChar = 70, start = 0) => {
+    return new Promise(resolve => {
+      let i = start;
+      const tick = () => {
+        if (i > text.length) return resolve();
+        typed.textContent = text.slice(0, i);
+        i++;
+        after(perChar + Math.random()*30, tick);
+      };
+      tick();
+    });
+  };
+
+  const start = async () => {
+    reset();
+
+    // 0.4s — focus search
+    after(400, () => { search.classList.add('is-active'); ph.style.display = 'none'; });
+
+    // 0.6s → ~2.0s — type "ServiceNow Developer"
+    after(600, () => typeText(TYPE_TEXT, 70));
+
+    // 2.4s → 3.0s — candidate cards stagger in (handled by CSS animation-delay)
+
+    // 3.4s — smart filter: low matches fade out
+    after(3400, () => {
+      rows.forEach(r => {
+        const m = +r.dataset.match;
+        if (m < 85) r.classList.add('filter-out');
+      });
+      count.textContent = '2';
+    });
+
+    // 4.8s — highlight best match (collapse handled by CSS transition)
+    after(4800, () => rows[0].classList.add('best'));
+
+    // 6.0s — show CTA + pulse
+    after(6000, () => { ctaWrap.classList.add('show'); });
+    after(6500, () => hireBtn.classList.add('pulse'));
+
+    // 7.0s — cursor flies in toward the button
+    after(7000, () => {
+      const cardRect = card.getBoundingClientRect();
+      const btnRect  = hireBtn.getBoundingClientRect();
+      const targetX  = btnRect.left + btnRect.width  * 0.72 - cardRect.left - 24*cardRect.width/cardRect.width;
+      const targetY  = btnRect.top  + btnRect.height * 0.55 - cardRect.top  - 28*cardRect.height/cardRect.height;
+      // Place cursor relative to .card (already positioned absolute in .card)
+      cursor.style.left = '0'; cursor.style.top = '0';
+      cursor.style.opacity = 1;
+      cursor.style.transform = `translate(${targetX}px, ${targetY}px)`;
+    });
+
+    // 7.9s — click feedback
+    after(7900, () => {
+      hireBtn.classList.remove('pulse');
+      hireBtn.style.transform = 'translateY(1px) scale(.985)';
+      after(160, () => { hireBtn.style.transform = ''; });
+    });
+
+    // 8.2s — success overlay
+    after(8200, () => success.classList.add('show'));
+  };
+
+  // Boot + loop
+  const LOOP_MS = 11000;
+  const tick = () => {
+    start();
+    after(LOOP_MS, tick);
+  };
+  tick();
+
+  // Restart on click for iteration
+  document.addEventListener('click', (e) => {
+    if (e.target.closest('#hireBtn')) return; // don't fight the demo
+    timers.forEach(clearTimeout); timers = [];
+    tick();
+  });
+})();
+</script>
+</body>
+</html>

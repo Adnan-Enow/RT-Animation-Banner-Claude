@@ -1,0 +1,312 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<title>Banner Frames — Motion</title>
+<meta name="viewport" content="width=1452, initial-scale=1" />
+<style>
+  /*
+    Loop layout (4.2s total)
+    ────────────────────────────────────────
+      0.00 – 0.25  F1 enter
+      0.25 – 1.20  F1 hold
+      1.20 – 1.50  F1 exit / F2 enter (overlap)
+      1.50 – 2.65  F2 hold
+      2.65 – 2.95  F2 exit / F3 enter (overlap)
+      2.95 – 4.10  F3 hold
+      4.10 – 4.20  F3 exit / F1 enter (loop)
+    Reference percentages (of 4.2s):
+      0%  6%  28.6%  35.7%  63.1%  70.2%  97.6%  100%
+   */
+  :root { --loop: 4.2s; }
+
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; background: #fff; overflow: hidden; }
+
+  .stage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    display: grid;
+    place-items: center;
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .banner {
+    position: relative;
+    width: min(100vw, calc(100vh * (1452 / 709)));
+    aspect-ratio: 1452 / 709;
+    overflow: hidden;
+    background: #fff;
+    animation: banner-breathe 6s ease-in-out infinite;
+  }
+  @keyframes banner-breathe {
+    0%, 100% { transform: scale(1.000); }
+    50%      { transform: scale(1.008); }
+  }
+
+  /* SVG frames are loaded as-is; files on disk are unchanged. */
+  .frame {
+    position: absolute;
+    inset: 0;
+    width: 100%; height: 100%;
+    display: block;
+    will-change: opacity, transform, filter;
+    opacity: 0;
+    transform: translate3d(0,0,0) scale(1);
+    filter: blur(0px);
+  }
+
+  /* ───────── Frame 1 — quick slide-in with overshoot ───────── */
+  .frame-1 { animation: f1 var(--loop) cubic-bezier(.18,.85,.24,1.05) infinite; }
+  @keyframes f1 {
+    0%    { opacity: 0; transform: translate3d(2.4%,0,0) scale(.985); filter: blur(8px); }
+    6%    { opacity: 1; transform: translate3d(-0.3%,0,0) scale(1.005); filter: blur(0); }
+    11%   { opacity: 1; transform: translate3d(0,0,0)     scale(1);     filter: blur(0); }
+    28.6% { opacity: 1; transform: translate3d(-0.7%,0,0) scale(1.004); filter: blur(0); }
+    35.7% { opacity: 0; transform: translate3d(-2.4%,0,0) scale(.99);   filter: blur(8px); }
+    100%  { opacity: 0; transform: translate3d(2.4%,0,0)  scale(.985);  filter: blur(8px); }
+  }
+
+  /* ───────── Frame 2 — quick pop-in scale ───────── */
+  .frame-2 { animation: f2 var(--loop) cubic-bezier(.18,.85,.24,1.05) infinite; }
+  @keyframes f2 {
+    0%, 28.6% { opacity: 0; transform: scale(.97)   translate3d(0, .8%, 0); filter: blur(8px); }
+    35.7%     { opacity: 1; transform: scale(1.006) translate3d(0,-.15%,0); filter: blur(0); }
+    42%       { opacity: 1; transform: scale(1)     translate3d(0, 0,   0); filter: blur(0); }
+    63.1%     { opacity: 1; transform: scale(1.005) translate3d(0,-.3%, 0); filter: blur(0); }
+    70.2%     { opacity: 0; transform: scale(1.018) translate3d(0,-.6%, 0); filter: blur(8px); }
+    100%      { opacity: 0; transform: scale(.97)   translate3d(0, .8%, 0); filter: blur(8px); }
+  }
+
+  /* ───────── Frame 3 — slide-up settle ───────── */
+  .frame-3 { animation: f3 var(--loop) cubic-bezier(.18,.85,.24,1.05) infinite; }
+  @keyframes f3 {
+    0%, 63.1% { opacity: 0; transform: translate3d(0, 1.8%, 0) scale(.99); filter: blur(8px); }
+    70.2%     { opacity: 1; transform: translate3d(0, -.2%, 0) scale(1.004); filter: blur(0); }
+    77%       { opacity: 1; transform: translate3d(0,  0,   0) scale(1);    filter: blur(0); }
+    97.6%     { opacity: 1; transform: translate3d(0, -.5%, 0) scale(1.003); filter: blur(0); }
+    100%      { opacity: 0; transform: translate3d(0,-1.4%, 0) scale(.992); filter: blur(8px); }
+  }
+
+  /* ──────────────────────────────────────────────────────────
+     OVERLAY MOTION LAYER
+     Positioned over the SVGs without modifying them.
+     Coordinates are in % of the 1452×709 banner.
+     Card content area in SVG: x550–903, y141–496.
+     Search bar (F2/F3): x562–729, y195–213.
+     ────────────────────────────────────────────────────────── */
+  .overlay { position: absolute; inset: 0; pointer-events: none; }
+
+  /*
+    1) SKELETON SHIMMER — soft glossy band sweeps over the card content area.
+       Subtle so it doesn't wash out the SVG content.
+  */
+  .shimmer {
+    position: absolute;
+    left: 37.88%; top: 19.89%;
+    width: 24.31%; height: 50.07%;
+    overflow: hidden;
+    border-radius: 4px;
+    opacity: .55;
+  }
+  .shimmer::before {
+    content: "";
+    position: absolute;
+    top: 0; bottom: 0;
+    left: -45%;
+    width: 30%;
+    background: linear-gradient(
+      100deg,
+      transparent 0%,
+      rgba(255,255,255,0) 40%,
+      rgba(255,255,255,0.45) 50%,
+      rgba(255,255,255,0) 60%,
+      transparent 100%
+    );
+    filter: blur(3px);
+    animation: shimmer-sweep 1.6s ease-in-out infinite;
+  }
+  @keyframes shimmer-sweep {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(450%); }
+  }
+
+  /*
+    2) SKELETON ROW HEARTBEAT — a thin pulse on the placeholder lines
+       inside Frame 1's avatar row. Active only during F1 hold.
+  */
+  .pulse {
+    position: absolute;
+    border-radius: 2px;
+    background: #d8d8d8;
+    opacity: 0;
+    animation: row-pulse var(--loop) ease-in-out infinite;
+  }
+  /* Frame 1 row line A (SVG 610,238 191×6 → %)  */
+  .pulse.r1 { left: 42.01%; top: 33.57%; width: 13.15%; height: 0.85%; }
+  /* Frame 1 row line B (SVG 610,251 162×6 → %)  */
+  .pulse.r2 { left: 42.01%; top: 35.40%; width: 11.16%; height: 0.85%; animation-delay: .12s; }
+  @keyframes row-pulse {
+    0%        { opacity: 0; }
+    6%        { opacity: .60; }
+    18%       { opacity: .25; }
+    28.6%     { opacity: .60; }
+    35.7%     { opacity: 0; }
+    100%      { opacity: 0; }
+  }
+
+  /*
+    3) SEARCH-BAR TYPEWRITER
+       An HTML span placed precisely over the search bar's text area.
+       During F1 hold a caret blinks. At the F1→F2 transition it types
+       "Service Developer" via a steps() width reveal. After F2 enters,
+       this overlay fades out and the SVG's native typed text takes over.
+       Position uses SVG search bar coords (562,195) → (729,213).
+  */
+  .typer {
+    position: absolute;
+    left: 40.16%;          /* x≈583 (just after the 🔍 icon at x≈571–580) */
+    top: 27.50%;           /* y≈195 baseline */
+    width: 10.40%;         /* up to ~734 (covers full "Service Developer") */
+    height: 2.70%;
+    display: flex; align-items: center;
+    overflow: hidden;
+    color: #454545;
+    font: 600 0.95vh "Suisse Int'l", Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    letter-spacing: -0.1px;
+    line-height: 1;
+    white-space: nowrap;
+    opacity: 0;
+    animation: typer-show var(--loop) linear infinite;
+  }
+  .typer .text {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    animation: typer-write var(--loop) steps(17, end) infinite;
+  }
+  .typer .caret {
+    display: inline-block;
+    width: 1px; height: 70%;
+    background: #454545;
+    margin-left: 1px;
+    animation: caret-blink .85s steps(2, end) infinite;
+  }
+  @keyframes typer-show {
+    /* Hidden during F1 hold (so SVG's "Search" placeholder is unobstructed).
+       Visible only across the F1→F2 transition window (~25%–40%). */
+    0%, 22%       { opacity: 0; }
+    25%           { opacity: 1; }
+    36%           { opacity: 1; }
+    40%           { opacity: 0; }   /* hand off to F2 SVG's native typed text */
+    100%          { opacity: 0; }
+  }
+  @keyframes typer-write {
+    /* Type quickly across the transition window. */
+    0%, 25%       { width: 0; }
+    37%           { width: 100%; }
+    100%          { width: 100%; }
+  }
+  @keyframes caret-blink { 50% { opacity: 0; } }
+
+  /*
+    4) CARD OBJECTS EASE-IN
+       Three vertical wipes (one per frame entry) sweep down the card area
+       to give the impression that inner objects ease into place.
+  */
+  .card-wipe {
+    position: absolute;
+    left: 37.88%; top: 19.89%;
+    width: 24.31%; height: 50.07%;
+    overflow: hidden;
+    border-radius: 4px;
+  }
+  .card-wipe::before {
+    content: "";
+    position: absolute; inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(255,255,255,0)   0%,
+      rgba(255,255,255,.55) 35%,
+      rgba(255,255,255,.75) 50%,
+      rgba(255,255,255,.55) 65%,
+      rgba(255,255,255,0)  100%
+    );
+    transform: translateY(-110%);
+    animation: card-wipe var(--loop) cubic-bezier(.22,.61,.36,1) infinite;
+  }
+  @keyframes card-wipe {
+    0%    { transform: translateY(-110%); }
+    8%    { transform: translateY(110%); }   /* F1 wipe */
+    28.6% { transform: translateY(110%); }
+    28.7% { transform: translateY(-110%); }
+    37.5% { transform: translateY(110%); }   /* F2 wipe */
+    63.1% { transform: translateY(110%); }
+    63.2% { transform: translateY(-110%); }
+    72%   { transform: translateY(110%); }   /* F3 wipe */
+    100%  { transform: translateY(110%); }
+  }
+
+  /*
+    5) PLACEHOLDER MASK — a white rect aligned to the "Search" placeholder
+       text (just to the right of the icon). It briefly hides the SVG's
+       placeholder while the HTML typewriter writes "Service Developer",
+       then disappears once F2's native typed text takes over.
+  */
+  .ph-mask {
+    position: absolute;
+    left: 40.16%;
+    top: 27.50%;
+    width: 4.20%;       /* covers the word "Search" only */
+    height: 2.70%;
+    background: #fff;
+    opacity: 0;
+    animation: ph-mask var(--loop) linear infinite;
+  }
+  @keyframes ph-mask {
+    0%, 22%   { opacity: 0; }
+    24%       { opacity: 1; }
+    36%       { opacity: 1; }
+    40%       { opacity: 0; }
+    100%      { opacity: 0; }
+  }
+
+  /* Pause everything on hover */
+  .stage:hover .frame,
+  .stage:hover .banner,
+  .stage:hover .overlay * { animation-play-state: paused; }
+
+  /* HUD */
+  .hud {
+    position: fixed; left: 14px; bottom: 12px;
+    font: 11px/1 -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+    color: #6b6f7a; user-select: none; letter-spacing: .3px;
+  }
+  .hud strong { color: #1f2330; font-weight: 600; }
+</style>
+</head>
+<body>
+  <div class="stage">
+    <div class="banner" id="banner">
+      <!-- SVG files loaded as-is. Their internal contents are unchanged on disk. -->
+      <img class="frame frame-1" src="frames/frame-1.svg" alt="" draggable="false" />
+      <img class="frame frame-2" src="frames/frame-2.svg" alt="" draggable="false" />
+      <img class="frame frame-3" src="frames/frame-3.svg" alt="" draggable="false" />
+
+      <!-- Overlay motion layer (no SVG changes) -->
+      <div class="overlay" aria-hidden="true">
+        <div class="shimmer"></div>
+        <div class="pulse r1"></div>
+        <div class="pulse r2"></div>
+        <div class="card-wipe"></div>
+        <div class="ph-mask"></div>
+        <div class="typer"><span class="text">Service Developer</span><span class="caret"></span></div>
+      </div>
+    </div>
+  </div>
+  <div class="hud"><strong>Banner Frames</strong> · 3-frame motion · 4.2s loop</div>
+</body>
+</html>

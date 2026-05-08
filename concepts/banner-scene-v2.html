@@ -1,0 +1,1520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<title>RecruitTalent · Banner v2 — Bigger Card · Stronger Transitions</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Inter', sans-serif; }
+  html, body { width: 100%; height: 100%; overflow: hidden; }
+  body { background: #0a0a0a; display: grid; place-items: center; }
+
+  .stage {
+    position: relative;
+    width: 100vw; height: 100vh;
+    max-width: 1452px; max-height: 709px;
+    aspect-ratio: 1452 / 709;
+    overflow: hidden;
+    background: #fff;
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+
+  .blobs { position: absolute; inset: 0; overflow: hidden; z-index: 0; }
+  .blobs svg { position: absolute; width: 100%; height: 100%; }
+  .grid { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+  .grid svg { width: 100%; height: 100%; display: block; }
+
+  .card {
+    position: absolute;
+    left: 36.98%; top: 21.72%;
+    width: 26.03%; height: 56.56%;
+    background: rgba(255,255,255,0.14);
+    backdrop-filter: blur(4.41px);
+    -webkit-backdrop-filter: blur(4.41px);
+    border: 0.76px solid rgba(255,255,255,0.45);
+    z-index: 2; overflow: hidden;
+  }
+
+  .placeholder {
+    position: absolute;
+    left: 4.76%; top: 6.98%;
+    width: 90.74%; height: 71.57%;
+    background: rgba(255,255,255,0.19);
+    overflow: hidden;
+  }
+
+  /* === CHAT INPUT === */
+  .chat-divider {
+    position: absolute;
+    left: 4.76%; right: 4.65%;
+    top: 89.00%; height: 0.58px;
+    background: #f3f3f3; opacity: 0.6;
+  }
+  .chat-text {
+    position: absolute;
+    left: 5.24%; top: 83.74%;
+    font-size: 11.5px; color: #fff;
+    font-weight: 500; letter-spacing: 0.01em;
+    line-height: 14px; white-space: nowrap;
+  }
+  .typing-text { color: #fff; }
+  .caret {
+    display: inline-block;
+    width: 1.2px; height: 11px;
+    background: #fff;
+    vertical-align: -1px; margin-left: 1px;
+    animation: blink 0.7s steps(2) infinite;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  .chat-add {
+    position: absolute;
+    left: 7.28%; top: 93.85%;
+    transform: translate(-50%, -50%);
+    width: 19px; height: 19px;
+    border-radius: 50%; background: #fff;
+    display: grid; place-items: center;
+  }
+  .chat-add svg { width: 11px; height: 11px; }
+  .chat-send {
+    position: absolute;
+    left: 92.72%; top: 93.77%;
+    transform: translate(-50%, -50%);
+    width: 19px; height: 19px;
+  }
+  .chat-send svg { width: 100%; height: 100%; }
+
+  /* ============================================ */
+  /* SHARED scene transitions                       */
+  /* ============================================ */
+  @keyframes scene-enter {
+    from { opacity: 0; transform: translateY(8px) scale(0.96); filter: blur(4px); }
+    to   { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+  }
+  @keyframes scene-exit {
+    from { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    to   { opacity: 0; transform: translateY(-8px) scale(0.96); filter: blur(4px); }
+  }
+
+  /* ============================================ */
+  /* SCENE 1 — PROPOSAL UI (visible 0–1.5s)        */
+  /* ============================================ */
+  .s1 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column;
+    gap: 10px; color: #fff;
+    animation: scene-exit 1.0s cubic-bezier(.4,0,.2,1) 1.5s forwards;
+  }
+  .s1-meta-row { display: flex; justify-content: space-between; align-items: center; }
+  .s1-tabs {
+    display: flex; gap: 4px; padding: 3px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 7px; width: fit-content;
+  }
+  .s1-tab {
+    padding: 4px 9px; font-size: 9px; font-weight: 500;
+    color: rgba(255,255,255,0.65); border-radius: 5px;
+  }
+  .s1-tab.active { background: rgba(255,255,255,0.92); color: #1a1a1a; font-weight: 600; }
+  .s1-meta-badge {
+    display: inline-flex; align-items: center; gap: 4px;
+    padding: 2px 7px;
+    background: rgba(51,98,243,0.7);
+    border-radius: 999px; color: #fff;
+    font-size: 7.5px; font-weight: 600;
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+  .s1-meta-badge::before {
+    content: ''; width: 4px; height: 4px;
+    border-radius: 50%; background: #fff;
+  }
+  .s1-title {
+    font-size: 14px; font-weight: 700; color: #fff;
+    line-height: 1.2; letter-spacing: -0.01em;
+  }
+  .s1-sections { display: flex; flex-direction: column; gap: 5px; margin-top: 2px; }
+  .s1-section {
+    display: grid;
+    grid-template-columns: 12px 18px 1fr auto auto;
+    align-items: center; gap: 8px;
+    padding: 6px 8px;
+    background: rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+  }
+  .s1-drag { display: flex; flex-direction: column; gap: 1.5px; color: rgba(255,255,255,0.4); }
+  .s1-drag span { width: 8px; height: 1px; background: currentColor; display: block; }
+  .s1-num { font-size: 8.5px; font-weight: 600; color: #ADC0FA; }
+  .s1-name { font-size: 10px; font-weight: 500; color: rgba(255,255,255,0.95); }
+  .s1-status {
+    font-size: 7.5px; font-weight: 600;
+    text-transform: uppercase; letter-spacing: 0.08em;
+    padding: 2px 6px; border-radius: 999px;
+    background: #3362F3; color: #fff;
+  }
+  .s1-pages { font-size: 9px; font-weight: 600; color: rgba(255,255,255,0.55); }
+  .s1-action {
+    display: grid;
+    grid-template-columns: 1fr 1fr auto;
+    align-items: center; gap: 8px;
+    margin-top: auto;
+    padding: 7px 8px;
+    background: rgba(255,255,255,0.09);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 6px;
+  }
+  .s1-stat-l { font-size: 7px; text-transform: uppercase; letter-spacing: 0.13em; color: rgba(255,255,255,0.5); font-weight: 600; }
+  .s1-stat-v { font-size: 12px; font-weight: 700; color: #fff; }
+  .s1-stat-v .accent { color: #ADC0FA; }
+  .s1-cta {
+    background: #fff; color: #1a1a1a;
+    font-size: 9px; font-weight: 700;
+    padding: 6px 11px; border-radius: 4px;
+    display: inline-flex; align-items: center; gap: 5px;
+  }
+  .s1-cta svg { width: 9px; height: 9px; }
+
+  /* ============================================ */
+  /* SCENE 2 — CODE TERMINAL (visible 3–8.5s)      */
+  /* ============================================ */
+  .s2 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column; color: #fff;
+    opacity: 0; transform: translateY(8px) scale(0.96); filter: blur(4px);
+    animation:
+      scene-enter 0.8s cubic-bezier(.22,1,.36,1) 3.0s forwards,
+      scene-exit 1.0s cubic-bezier(.4,0,.2,1) 8.5s forwards;
+  }
+
+  .ide {
+    flex: 1;
+    display: flex; flex-direction: column;
+    background:
+      linear-gradient(135deg,
+        rgba(173,192,250,0.30) 0%,
+        rgba(205,176,255,0.18) 60%,
+        rgba(51,98,243,0.18) 100%);
+    border: 0.5px solid rgba(255,255,255,0.45);
+    border-radius: 7px;
+    overflow: hidden;
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: 0 6px 18px rgba(51,98,243,0.18);
+    position: relative;
+  }
+  .ide::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 35%);
+    pointer-events: none;
+  }
+  .ide-bar {
+    position: relative;
+    display: flex; align-items: center;
+    padding: 6px 9px;
+    background: rgba(255,255,255,0.12);
+    border-bottom: 0.5px solid rgba(255,255,255,0.18);
+    gap: 8px;
+  }
+  .ide-dots { display: flex; gap: 4px; }
+  .ide-dot { width: 7px; height: 7px; border-radius: 50%; }
+  .ide-dot.r { background: #ff6b66; }
+  .ide-dot.y { background: #ffc940; }
+  .ide-dot.g { background: #36d268; }
+  .ide-file {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8.5px; color: rgba(255,255,255,0.7);
+    margin-left: 4px;
+  }
+  .ide-file .file-active { color: #fff; font-weight: 600; }
+  .ide-status {
+    margin-left: auto;
+    display: inline-flex; align-items: center; gap: 4px;
+    font-size: 7.5px; font-weight: 700; color: #fff;
+    letter-spacing: 0.07em; text-transform: uppercase;
+    opacity: 0;
+    animation: fade-in 0.4s ease-out 6.2s forwards;
+  }
+  .ide-status::before {
+    content: ''; width: 5px; height: 5px;
+    background: #ADC0FA; border-radius: 50%;
+    box-shadow: 0 0 6px rgba(173,192,250,1);
+    animation: ping 1.4s ease-in-out infinite;
+  }
+  @keyframes ping {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+  .ide-code {
+    position: relative; flex: 1;
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    padding: 9px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 9.5px; line-height: 1.55;
+    overflow: hidden;
+  }
+  .ide-gutter {
+    color: rgba(255,255,255,0.4);
+    text-align: right;
+    padding-right: 6px;
+    font-size: 8.5px;
+  }
+  .ide-gutter span { display: block; }
+  .ide-lines { padding-right: 10px; }
+  .ide-line {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    opacity: 0;
+    animation: line-show 0.1s linear forwards;
+  }
+  .ide-line .typed {
+    display: inline-block;
+    overflow: hidden;
+    white-space: nowrap;
+    width: 0;
+    vertical-align: bottom;
+    animation: line-type 0.7s steps(40, end) forwards;
+  }
+  @keyframes line-show { to { opacity: 1; width: 100%; } }
+  @keyframes line-type { to { width: 100%; } }
+
+  .l1 { animation-delay: 4.7s; } .l1 .typed { animation-delay: 4.75s; }
+  .l2 { animation-delay: 5.30s; } .l2 .typed { animation-delay: 5.35s; }
+  .l3 { animation-delay: 5.85s; } .l3 .typed { animation-delay: 5.90s; }
+  .l4 { animation-delay: 6.50s; } .l4 .typed { animation-delay: 6.55s; }
+  .l5 { animation-delay: 7.05s; } .l5 .typed { animation-delay: 7.10s; }
+
+  .ide-line.active {
+    background: linear-gradient(90deg, rgba(51,98,243,0.30), transparent 80%);
+    border-left: 1.5px solid #3362F3;
+    padding-left: 1.5px; margin-left: -1.5px;
+  }
+  .kw  { color: #FFFFFF; font-weight: 600; }
+  .fn  { color: #FFE7C0; }
+  .var { color: rgba(255,255,255,0.95); }
+  .str { color: #FFD9A8; }
+  .cm  { color: rgba(255,255,255,0.6); font-style: italic; }
+  .pun { color: rgba(255,255,255,0.85); }
+
+  .ide-result {
+    position: relative;
+    border-top: 0.5px solid rgba(255,255,255,0.2);
+    padding: 7px 11px;
+    display: flex; align-items: center; justify-content: space-between;
+    background: rgba(255,255,255,0.10);
+    opacity: 0;
+    animation: fade-in 0.5s cubic-bezier(.22,1,.36,1) 7.7s forwards;
+  }
+  .result-l { display: flex; align-items: center; gap: 6px; font-size: 8.5px; font-weight: 700; color: #fff; }
+  .result-check {
+    width: 12px; height: 12px;
+    background: #fff; color: #3362F3;
+    border-radius: 50%;
+    display: grid; place-items: center;
+  }
+  .result-check svg { width: 7px; height: 7px; }
+  .result-meta {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.7);
+  }
+  .result-meta .pass { color: #fff; font-weight: 700; }
+
+  /* ============================================ */
+  /* SCENE 3 — STAFFING (visible 10–13.5s)          */
+  /* Hero spotlight + talent constellation strip   */
+  /* ============================================ */
+  .s3 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column;
+    gap: 9px;
+    color: #fff;
+    opacity: 0; transform: translateY(8px) scale(0.96); filter: blur(4px);
+    animation:
+      scene-enter 0.8s cubic-bezier(.22,1,.36,1) 10.0s forwards,
+      scene-exit 1.0s cubic-bezier(.4,0,.2,1) 13.5s forwards;
+  }
+
+  /* Hero spotlight — featured top match */
+  .s3-hero {
+    position: relative;
+    padding: 13px 14px 14px;
+    border-radius: 9px;
+    background:
+      radial-gradient(120% 90% at 80% 20%,
+        rgba(255,255,255,0.30) 0%,
+        rgba(173,192,250,0.20) 35%,
+        rgba(51,98,243,0.32) 80%);
+    border: 0.7px solid rgba(255,255,255,0.55);
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: 0 8px 22px rgba(51,98,243,0.30);
+    overflow: hidden;
+  }
+  .s3-hero::before {
+    /* prismatic spotlight sweep */
+    content: '';
+    position: absolute;
+    top: -50%; right: -10%;
+    width: 60%; height: 200%;
+    background: radial-gradient(ellipse at center,
+      rgba(255,255,255,0.28) 0%,
+      transparent 55%);
+    transform: rotate(15deg);
+    pointer-events: none;
+  }
+  .s3-hero::after {
+    /* "match found" sweep line drawn across on entry */
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: linear-gradient(90deg,
+      transparent,
+      rgba(255,255,255,0.32) 50%,
+      transparent);
+    animation: hero-sweep 1.4s cubic-bezier(.22,1,.36,1) 10.5s 1 forwards;
+    pointer-events: none;
+  }
+  @keyframes hero-sweep {
+    0% { left: -100%; opacity: 0; }
+    20% { opacity: 1; }
+    100% { left: 100%; opacity: 0; }
+  }
+
+  .s3-tag {
+    position: absolute;
+    top: 9px; right: 11px;
+    font-size: 7.5px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    display: inline-flex; align-items: center; gap: 4px;
+    opacity: 0;
+    animation: fade-in 0.5s ease-out 11.0s forwards;
+  }
+  .s3-tag svg { width: 9px; height: 9px; color: #FFE7C0; }
+
+  .s3-row {
+    position: relative;
+    display: flex; align-items: center;
+    gap: 12px;
+  }
+
+  .s3-avatar-big {
+    position: relative;
+    width: 52px; height: 52px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #CDB0FF 0%, #6B8FFF 50%, #3362F3 100%);
+    color: #fff;
+    font-size: 17px; font-weight: 700;
+    letter-spacing: 0.02em;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.35),
+      0 0 0 1.5px rgba(255,255,255,0.5),
+      0 4px 14px rgba(51,98,243,0.45);
+    opacity: 0; transform: scale(0.7);
+    animation: avatar-pop 0.6s cubic-bezier(.22,1.2,.36,1) 10.6s forwards;
+  }
+  @keyframes avatar-pop {
+    to { opacity: 1; transform: scale(1); }
+  }
+  .s3-avatar-big::after {
+    /* outer pulsing halo */
+    content: '';
+    position: absolute;
+    inset: -6px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.55);
+    animation: halo-ping 2.2s ease-out 11.5s infinite;
+    opacity: 0;
+  }
+  @keyframes halo-ping {
+    0% { transform: scale(0.95); opacity: 0.9; }
+    100% { transform: scale(1.35); opacity: 0; }
+  }
+
+  .s3-hero-info {
+    flex: 1; min-width: 0;
+    opacity: 0;
+    animation: fade-up 0.5s ease-out 10.9s forwards;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .s3-name {
+    font-size: 14px; font-weight: 700;
+    color: #fff;
+    letter-spacing: -0.015em;
+    line-height: 1.1;
+  }
+  .s3-role {
+    font-size: 9.5px;
+    font-weight: 500;
+    color: rgba(255,255,255,0.85);
+    margin-top: 2px;
+  }
+  .s3-meta {
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.55);
+    margin-top: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 600;
+  }
+
+  .s3-match-block {
+    flex-shrink: 0;
+    text-align: right;
+    opacity: 0;
+    animation: fade-up 0.5s ease-out 11.1s forwards;
+  }
+  .s3-pct {
+    font-size: 28px; font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.04em;
+    font-feature-settings: "tnum";
+    line-height: 0.95;
+  }
+  .s3-pct sup {
+    font-size: 12px;
+    vertical-align: top;
+    color: rgba(255,255,255,0.7);
+    margin-left: 1px;
+    font-weight: 600;
+  }
+  .s3-match-lbl {
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.7);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-top: 2px;
+  }
+
+  /* Skill chips row */
+  .s3-skills {
+    display: flex; flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 12px;
+    opacity: 0;
+    animation: fade-up 0.5s ease-out 11.3s forwards;
+  }
+  .s3-chip {
+    font-size: 7.5px; font-weight: 600;
+    padding: 2.5px 7px;
+    background: rgba(255,255,255,0.22);
+    color: #fff;
+    border-radius: 999px;
+    border: 0.5px solid rgba(255,255,255,0.35);
+    letter-spacing: 0.01em;
+    backdrop-filter: blur(4px);
+  }
+
+  /* Talent pool — colorful avatar constellation */
+  .s3-pool {
+    position: relative;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.10);
+    border: 0.5px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(6px);
+  }
+  .s3-pool-head {
+    display: flex; justify-content: space-between; align-items: baseline;
+    margin-bottom: 7px;
+    opacity: 0;
+    animation: fade-up 0.4s ease-out 11.5s forwards;
+  }
+  .s3-pool-lbl {
+    font-size: 7.5px; font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+  .s3-pool-count {
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 500;
+  }
+  .s3-pool-count b {
+    color: #ADC0FA;
+    font-weight: 700;
+  }
+  .s3-strip {
+    display: flex; gap: 6px;
+    align-items: center;
+  }
+  .s3-mini {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 7.5px; font-weight: 700;
+    letter-spacing: 0.02em;
+    display: grid; place-items: center;
+    flex-shrink: 0;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.3),
+      0 0 0 1px rgba(255,255,255,0.4);
+    opacity: 0;
+    transform: translateX(-6px) scale(0.6);
+    animation: mini-in 0.4s cubic-bezier(.22,1.2,.36,1) forwards;
+  }
+  .s3-mini:nth-child(1) { animation-delay: 11.7s; }
+  .s3-mini:nth-child(2) { animation-delay: 11.78s; }
+  .s3-mini:nth-child(3) { animation-delay: 11.86s; }
+  .s3-mini:nth-child(4) { animation-delay: 11.94s; }
+  .s3-mini:nth-child(5) { animation-delay: 12.02s; }
+  .s3-mini:nth-child(6) { animation-delay: 12.10s; }
+  .s3-mini:nth-child(7) { animation-delay: 12.18s; }
+  .s3-mini:nth-child(8) { animation-delay: 12.26s; }
+  @keyframes mini-in {
+    to { opacity: 1; transform: translateX(0) scale(1); }
+  }
+  .s3-mini.more {
+    background: transparent;
+    border: 0.7px dashed rgba(255,255,255,0.5);
+    color: rgba(255,255,255,0.85);
+    font-size: 7px;
+    box-shadow: none;
+  }
+
+  /* Action bar */
+  .s3-action {
+    margin-top: auto;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: rgba(255,255,255,0.10);
+    border: 0.5px solid rgba(255,255,255,0.22);
+    backdrop-filter: blur(6px);
+    display: flex; align-items: center; justify-content: space-between;
+    gap: 12px;
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(.22,1,.36,1) 12.4s forwards;
+  }
+  .s3-stat-inline {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 9px;
+    color: rgba(255,255,255,0.85);
+    font-weight: 500;
+  }
+  .s3-stat-inline svg {
+    width: 12px; height: 12px;
+    color: #ADC0FA;
+  }
+  .s3-stat-inline b {
+    color: #fff;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+  .s3-stat-divider {
+    width: 1px; height: 12px;
+    background: rgba(255,255,255,0.25);
+  }
+  .s3-cta {
+    display: inline-flex; align-items: center; gap: 5px;
+    background: #fff;
+    color: #1a1a1a;
+    padding: 6px 12px;
+    border-radius: 5px;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: -0.005em;
+    animation: cta-pulse 2s ease-in-out 12.8s infinite;
+  }
+  .s3-cta svg { width: 9px; height: 9px; }
+  @keyframes cta-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(255,255,255,0); }
+    50% { box-shadow: 0 0 0 4px rgba(255,255,255,0.22); }
+  }
+
+  /* ============================================ */
+  /* SCENE 4 — HELPDESK (visible 15s–21s)            */
+  /* Live ops dashboard + ticket activity stream   */
+  /* ============================================ */
+  .s4 {
+    position: absolute; inset: 0;
+    padding: 14px 14px 12px;
+    display: flex; flex-direction: column;
+    color: #fff;
+    opacity: 0; transform: translateY(8px) scale(0.96); filter: blur(4px);
+    animation: scene-enter 0.8s cubic-bezier(.22,1,.36,1) 15.0s forwards;
+  }
+
+  .s4-panel {
+    flex: 1;
+    display: flex; flex-direction: column;
+    background:
+      linear-gradient(135deg,
+        rgba(173,192,250,0.30) 0%,
+        rgba(205,176,255,0.18) 60%,
+        rgba(51,98,243,0.18) 100%);
+    border: 0.5px solid rgba(255,255,255,0.45);
+    border-radius: 8px;
+    overflow: hidden;
+    backdrop-filter: blur(8px) saturate(120%);
+    -webkit-backdrop-filter: blur(8px) saturate(120%);
+    box-shadow: 0 6px 18px rgba(51,98,243,0.18);
+    position: relative;
+  }
+  .s4-panel::before {
+    content: ''; position: absolute; inset: 0;
+    background: linear-gradient(180deg, rgba(255,255,255,0.18) 0%, transparent 35%);
+    pointer-events: none;
+  }
+
+  /* Header bar */
+  .s4-bar {
+    position: relative;
+    display: flex; align-items: center;
+    padding: 7px 11px;
+    background: rgba(255,255,255,0.12);
+    border-bottom: 0.5px solid rgba(255,255,255,0.18);
+    gap: 8px;
+  }
+  .s4-live {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 8px; font-weight: 700;
+    color: #fff;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+  .s4-live::before {
+    content: ''; width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ADC0FA;
+    box-shadow:
+      0 0 0 2px rgba(173,192,250,0.25),
+      0 0 8px rgba(173,192,250,1);
+    animation: ping 1.4s ease-in-out infinite;
+  }
+  .s4-sla {
+    margin-left: auto;
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.6);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    font-weight: 600;
+    display: inline-flex; align-items: baseline; gap: 4px;
+  }
+  .s4-sla b {
+    color: #fff;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: -0.01em;
+  }
+
+  /* Hero metric panel */
+  .s4-hero {
+    position: relative;
+    padding: 12px 14px 10px;
+    border-bottom: 0.5px solid rgba(255,255,255,0.12);
+  }
+  .s4-metric-row {
+    display: flex; align-items: flex-end;
+    gap: 8px;
+    margin-bottom: 2px;
+    opacity: 0;
+    animation: fade-up 0.5s cubic-bezier(.22,1,.36,1) 15.6s forwards;
+  }
+  @keyframes fade-up {
+    from { opacity: 0; transform: translateY(6px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .s4-bolt {
+    width: 18px; height: 18px;
+    color: #FFE7C0;
+    margin-bottom: 4px;
+    animation: bolt-flash 1.6s ease-in-out 16s infinite;
+  }
+  @keyframes bolt-flash {
+    0%, 100% { filter: drop-shadow(0 0 0 transparent); transform: scale(1); }
+    50% { filter: drop-shadow(0 0 6px rgba(255,231,192,0.9)); transform: scale(1.1); }
+  }
+  .s4-num {
+    font-size: 30px;
+    font-weight: 800;
+    color: #fff;
+    letter-spacing: -0.04em;
+    line-height: 0.9;
+    font-feature-settings: "tnum";
+  }
+  .s4-num-unit {
+    font-size: 12px;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    letter-spacing: -0.01em;
+    margin-left: 3px;
+  }
+  .s4-trend-badge {
+    display: inline-flex; align-items: center; gap: 3px;
+    margin-left: auto;
+    margin-bottom: 4px;
+    padding: 2px 7px;
+    background: rgba(173,192,250,0.30);
+    color: #fff;
+    border: 0.5px solid rgba(173,192,250,0.5);
+    border-radius: 999px;
+    font-size: 7.5px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    opacity: 0;
+    animation: fade-up 0.4s ease-out 17.4s forwards;
+  }
+  .s4-trend-badge svg { width: 7px; height: 7px; }
+
+  .s4-metric-lbl {
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    margin-bottom: 8px;
+    opacity: 0;
+    animation: fade-up 0.4s ease-out 15.8s forwards;
+  }
+
+  /* Sparkline */
+  .s4-spark {
+    width: 100%; height: 28px;
+    display: block;
+  }
+  .s4-spark polyline {
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: spark-draw 1.6s cubic-bezier(.4,0,.2,1) 16.0s forwards;
+  }
+  @keyframes spark-draw {
+    to { stroke-dashoffset: 0; }
+  }
+  .s4-spark .baseline {
+    stroke-dasharray: 4 4;
+    stroke: rgba(255,255,255,0.25);
+    stroke-width: 0.5;
+  }
+  .s4-spark .area {
+    opacity: 0;
+    animation: fade-in 0.6s ease-out 17.0s forwards;
+  }
+  .s4-spark .point {
+    opacity: 0;
+    animation: fade-in 0.3s ease-out 17.4s forwards;
+  }
+
+  /* Ticket activity stream */
+  .s4-stream {
+    flex: 1;
+    padding: 9px 11px 11px;
+    display: flex; flex-direction: column;
+    gap: 4px;
+    overflow: hidden;
+  }
+  .s4-stream-h {
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 7px;
+    font-weight: 700;
+    color: rgba(255,255,255,0.55);
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+    margin-bottom: 3px;
+    opacity: 0;
+    animation: fade-up 0.4s ease-out 17.8s forwards;
+  }
+  .s4-stream-count {
+    color: rgba(255,255,255,0.7);
+  }
+  .s4-stream-count b {
+    color: #fff;
+    font-weight: 700;
+  }
+  .s4-ticket {
+    display: grid;
+    grid-template-columns: 14px 36px 1fr auto auto;
+    align-items: center;
+    gap: 8px;
+    padding: 5px 8px;
+    background: rgba(255,255,255,0.08);
+    border: 0.5px solid rgba(255,255,255,0.15);
+    border-radius: 5px;
+    opacity: 0;
+    transform: translateY(-6px);
+    animation: ticket-drop 0.4s cubic-bezier(.22,1,.36,1) forwards;
+  }
+  .s4-ticket:nth-child(2) { animation-delay: 18.0s; }
+  .s4-ticket:nth-child(3) { animation-delay: 18.2s; }
+  .s4-ticket:nth-child(4) { animation-delay: 18.4s; }
+  @keyframes ticket-drop {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .s4-ticket.active {
+    background: rgba(51,98,243,0.30);
+    border: 0.6px solid rgba(255,255,255,0.45);
+    animation:
+      ticket-drop 0.4s cubic-bezier(.22,1,.36,1) 18.4s forwards,
+      active-pulse 2s ease-in-out 19.0s infinite;
+  }
+  @keyframes active-pulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(51,98,243,0); }
+    50% { box-shadow: 0 0 0 3px rgba(51,98,243,0.35); }
+  }
+
+  .s4-tcheck {
+    width: 13px; height: 13px;
+    border-radius: 50%;
+    background: #fff;
+    color: #3362F3;
+    display: grid; place-items: center;
+  }
+  .s4-tcheck svg { width: 8px; height: 8px; }
+  .s4-tcheck.live {
+    background: #ADC0FA;
+    color: #1a1a1a;
+    animation: live-spin 1.4s linear infinite;
+  }
+  @keyframes live-spin {
+    to { transform: rotate(360deg); }
+  }
+  .s4-tcheck.live svg { width: 8px; height: 8px; }
+
+  .s4-tnum {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8px;
+    color: rgba(255,255,255,0.6);
+    font-weight: 500;
+  }
+  .s4-ttitle {
+    font-size: 9.5px;
+    color: #fff;
+    font-weight: 500;
+    letter-spacing: -0.005em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .s4-ttag {
+    font-size: 7px; font-weight: 700;
+    padding: 1.5px 5px;
+    background: rgba(205,176,255,0.30);
+    color: #fff;
+    border-radius: 3px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+  }
+  .s4-ttime {
+    font-size: 7.5px;
+    color: rgba(255,255,255,0.55);
+    font-weight: 600;
+    font-feature-settings: "tnum";
+    min-width: 38px;
+    text-align: right;
+  }
+  .s4-ttime.live {
+    color: #ADC0FA;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 7px;
+  }
+
+  @keyframes fade-in { to { opacity: 1; } }
+
+  .hud {
+    position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+    background: rgba(0,0,0,0.78); color: #fff; backdrop-filter: blur(10px);
+    padding: 8px 16px; border-radius: 999px; font-size: 12px;
+    z-index: 100; display: flex; gap: 16px; align-items: center;
+  }
+  .hud strong { color: #ADC0FA; }
+
+  /* ============================================================ */
+  /* ===  v3 OVERRIDES — White card, black text, kept transitions */
+  /* ============================================================ */
+
+  /* --- 1. Card: ORIGINAL size + position; just repaint white --- */
+  .card {
+    background: rgba(255,255,255,0.96) !important;
+    backdrop-filter: blur(8px) saturate(140%) !important;
+    -webkit-backdrop-filter: blur(8px) saturate(140%) !important;
+    border: 0.8px solid rgba(0,0,0,0.10) !important;
+    border-radius: 8px;
+    box-shadow:
+      0 12px 32px rgba(20,40,90,0.20),
+      0 1px 0 rgba(255,255,255,0.6) inset;
+  }
+  .placeholder { background: transparent !important; }
+
+  /* --- 2. Stronger transitions (kept from v2) --- */
+  @keyframes scene-enter {
+    from { opacity: 0; transform: translateX(40px) scale(0.95); filter: blur(8px); }
+    to   { opacity: 1; transform: translateX(0)    scale(1);    filter: blur(0); }
+  }
+  @keyframes scene-exit {
+    from { opacity: 1; transform: translateX(0)     scale(1);    filter: blur(0); }
+    to   { opacity: 0; transform: translateX(-40px) scale(0.96); filter: blur(6px); }
+  }
+  .s1 {
+    opacity: 0;
+    transform: translateX(40px) scale(0.95);
+    filter: blur(8px);
+    animation:
+      scene-enter 1.0s cubic-bezier(.22,1,.36,1) 0.15s forwards,
+      scene-exit  1.0s cubic-bezier(.4,0,.2,1)   1.5s forwards !important;
+  }
+
+  /* Shimmer wipe — recoloured for white card (subtle blue gloss) */
+  .v2-shimmer {
+    position: absolute; inset: 0;
+    border-radius: 8px;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 4;
+  }
+  .v2-shimmer::before {
+    content: '';
+    position: absolute;
+    top: 0; left: -120%;
+    width: 60%; height: 100%;
+    background: linear-gradient(105deg,
+      transparent 0%,
+      rgba(51,98,243,0.06) 35%,
+      rgba(51,98,243,0.22) 50%,
+      rgba(51,98,243,0.06) 65%,
+      transparent 100%);
+    transform: skewX(-12deg);
+    filter: blur(2px);
+    animation:
+      v2-wipe 0.9s cubic-bezier(.4,0,.2,1) 1.5s,
+      v2-wipe 0.9s cubic-bezier(.4,0,.2,1) 9.0s,
+      v2-wipe 0.9s cubic-bezier(.4,0,.2,1) 13.5s,
+      v2-wipe 0.9s cubic-bezier(.4,0,.2,1) 14.6s;
+  }
+  @keyframes v2-wipe {
+    0%   { left: -120%; opacity: 0; }
+    20%  { opacity: 1; }
+    100% { left: 160%; opacity: 0; }
+  }
+
+  /* Border flash on the card (blue glow ring at scene change) */
+  .card {
+    animation:
+      v2-flash 0.9s cubic-bezier(.4,0,.2,1) 1.5s,
+      v2-flash 0.9s cubic-bezier(.4,0,.2,1) 9.0s,
+      v2-flash 0.9s cubic-bezier(.4,0,.2,1) 13.5s,
+      v2-flash 0.9s cubic-bezier(.4,0,.2,1) 14.6s;
+  }
+  @keyframes v2-flash {
+    0%   { box-shadow: 0 12px 32px rgba(20,40,90,0.20), 0 1px 0 rgba(255,255,255,0.6) inset, 0 0 0 0 rgba(51,98,243,0); }
+    35%  { box-shadow: 0 12px 32px rgba(20,40,90,0.30), 0 1px 0 rgba(255,255,255,0.6) inset, 0 0 0 5px rgba(51,98,243,0.20); }
+    100% { box-shadow: 0 12px 32px rgba(20,40,90,0.20), 0 1px 0 rgba(255,255,255,0.6) inset, 0 0 0 0 rgba(51,98,243,0); }
+  }
+
+  /* --- 3. Chat input — black on white --- */
+  .chat-text     { color: #1a1a1a !important; }
+  .typing-text   { color: #1a1a1a !important; }
+  .caret         { background: #1a1a1a !important; }
+  .chat-divider  { background: rgba(0,0,0,0.10) !important; opacity: 1 !important; }
+  .chat-add      { background: #f1f3f5 !important; border: 0.5px solid rgba(0,0,0,0.10); }
+  .chat-add svg  { stroke: #1a1a1a !important; }
+  .chat-send svg path { fill: #1a1a1a !important; stroke: #1a1a1a !important; }
+
+  /* --- 4. SCENE 1 — Proposal --- */
+  .s1               { color: #1a1a1a !important; }
+  .s1-tabs          { background: rgba(0,0,0,0.05) !important; }
+  .s1-tab           { color: rgba(0,0,0,0.55) !important; }
+  .s1-tab.active    { background: #1a1a1a !important; color: #fff !important; }
+  .s1-meta-badge    { background: #3362F3 !important; color: #fff !important; }
+  .s1-meta-badge::before { background: #fff !important; }
+  .s1-title         { color: #0f1115 !important; }
+  .s1-section       {
+    background: rgba(0,0,0,0.03) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .s1-drag          { color: rgba(0,0,0,0.30) !important; }
+  .s1-num           { color: #3362F3 !important; }
+  .s1-name          { color: rgba(0,0,0,0.92) !important; }
+  .s1-status        { background: #3362F3 !important; color: #fff !important; }
+  .s1-pages         { color: rgba(0,0,0,0.50) !important; }
+  .s1-action        {
+    background: rgba(0,0,0,0.03) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .s1-stat-l        { color: rgba(0,0,0,0.50) !important; }
+  .s1-stat-v        { color: #0f1115 !important; }
+  .s1-stat-v .accent { color: #3362F3 !important; }
+  .s1-cta           { background: #1a1a1a !important; color: #fff !important; }
+
+  /* --- 5. SCENE 2 — IDE (light theme) --- */
+  .ide              {
+    background: linear-gradient(135deg, #f7f9fc 0%, #eef2fb 100%) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06) !important;
+  }
+  .ide::before      { background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 35%) !important; }
+  .ide-bar          {
+    background: rgba(0,0,0,0.04) !important;
+    border-bottom: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .ide-file         { color: rgba(0,0,0,0.55) !important; }
+  .ide-file .file-active { color: #0f1115 !important; }
+  .ide-status       { color: #3362F3 !important; }
+  .ide-status::before { background: #3362F3 !important; box-shadow: 0 0 6px rgba(51,98,243,0.6) !important; }
+  .ide-gutter       { color: rgba(0,0,0,0.30) !important; }
+  .ide-line.active  {
+    background: linear-gradient(90deg, rgba(51,98,243,0.10), transparent 80%) !important;
+    border-left: 1.5px solid #3362F3 !important;
+  }
+  .kw   { color: #7c3aed !important; }
+  .fn   { color: #c2410c !important; }
+  .var  { color: #0f1115 !important; }
+  .str  { color: #15803d !important; }
+  .cm   { color: rgba(0,0,0,0.45) !important; }
+  .pun  { color: rgba(0,0,0,0.65) !important; }
+  .ide-result       {
+    background: rgba(51,98,243,0.06) !important;
+    border-top: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .result-l         { color: #0f1115 !important; }
+  .result-check     { background: #3362F3 !important; color: #fff !important; }
+  .result-meta      { color: rgba(0,0,0,0.55) !important; }
+  .result-meta .pass { color: #0f1115 !important; }
+
+  /* --- 6. SCENE 3 — Staffing --- */
+  .s3               { color: #1a1a1a !important; }
+  .s3-hero          {
+    background: linear-gradient(135deg, #eef2ff 0%, #f5f0ff 60%, #e8efff 100%) !important;
+    border: 0.5px solid rgba(0,0,0,0.08) !important;
+    box-shadow: 0 4px 14px rgba(51,98,243,0.10) !important;
+  }
+  .s3-hero::before  {
+    background: radial-gradient(ellipse at center, rgba(51,98,243,0.10) 0%, transparent 55%) !important;
+  }
+  .s3-tag           { color: #3362F3 !important; }
+  .s3-tag svg       { color: #f59e0b !important; }
+  .s3-name          { color: #0f1115 !important; }
+  .s3-role          { color: rgba(0,0,0,0.70) !important; }
+  .s3-meta          { color: rgba(0,0,0,0.50) !important; }
+  .s3-pct           { color: #0f1115 !important; }
+  .s3-pct sup       { color: rgba(0,0,0,0.50) !important; }
+  .s3-match-lbl     { color: rgba(0,0,0,0.55) !important; }
+  .s3-chip          {
+    background: rgba(51,98,243,0.08) !important;
+    color: #3362F3 !important;
+    border: 0.5px solid rgba(51,98,243,0.20) !important;
+  }
+  .s3-avatar-big::after { border: 1px solid rgba(51,98,243,0.50) !important; }
+  .s3-pool          {
+    background: rgba(0,0,0,0.03) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .s3-pool-lbl      { color: rgba(0,0,0,0.65) !important; }
+  .s3-pool-count    { color: rgba(0,0,0,0.50) !important; }
+  .s3-pool-count b  { color: #3362F3 !important; }
+  .s3-mini.more     {
+    border: 0.7px dashed rgba(0,0,0,0.30) !important;
+    color: rgba(0,0,0,0.55) !important;
+  }
+  .s3-action        {
+    background: rgba(0,0,0,0.03) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .s3-stat-inline   { color: rgba(0,0,0,0.65) !important; }
+  .s3-stat-inline svg { color: #3362F3 !important; }
+  .s3-stat-inline b { color: #0f1115 !important; }
+  .s3-stat-divider  { background: rgba(0,0,0,0.15) !important; }
+  .s3-cta           { background: #1a1a1a !important; color: #fff !important; }
+
+  /* --- 7. SCENE 4 — Helpdesk --- */
+  .s4               { color: #1a1a1a !important; }
+  .s4-panel         {
+    background: linear-gradient(135deg, #f7f9fc 0%, #eef2fb 60%, #e9efff 100%) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+    box-shadow: 0 4px 14px rgba(51,98,243,0.10) !important;
+  }
+  .s4-panel::before { background: linear-gradient(180deg, rgba(255,255,255,0.6) 0%, transparent 35%) !important; }
+  .s4-bar           {
+    background: rgba(0,0,0,0.04) !important;
+    border-bottom: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .s4-live          { color: #1a1a1a !important; }
+  .s4-live::before  {
+    background: #3362F3 !important;
+    box-shadow: 0 0 0 2px rgba(51,98,243,0.20), 0 0 8px rgba(51,98,243,0.6) !important;
+  }
+  .s4-sla           { color: rgba(0,0,0,0.55) !important; }
+  .s4-sla b         { color: #0f1115 !important; }
+  .s4-bolt          { color: #f59e0b !important; }
+  .s4-num           { color: #0f1115 !important; }
+  .s4-num-unit      { color: rgba(0,0,0,0.55) !important; }
+  .s4-trend-badge   {
+    background: rgba(51,98,243,0.10) !important;
+    color: #3362F3 !important;
+    border: 0.5px solid rgba(51,98,243,0.30) !important;
+  }
+  .s4-metric-lbl    { color: rgba(0,0,0,0.50) !important; }
+  .s4-spark polyline { stroke: #3362F3 !important; }
+  .s4-spark .baseline { stroke: rgba(0,0,0,0.20) !important; }
+  .s4-spark .area   { fill: rgba(51,98,243,0.10) !important; }
+  .s4-spark .point  { fill: #f59e0b !important; }
+  .s4-stream-h      { color: rgba(0,0,0,0.55) !important; }
+  .s4-stream-count  { color: rgba(0,0,0,0.55) !important; }
+  .s4-stream-count b { color: #0f1115 !important; }
+  .s4-ticket        {
+    background: rgba(0,0,0,0.03) !important;
+    border: 0.5px solid rgba(0,0,0,0.10) !important;
+  }
+  .s4-ticket.active {
+    background: rgba(51,98,243,0.10) !important;
+    border: 0.6px solid rgba(51,98,243,0.30) !important;
+  }
+  .s4-tcheck        { background: #3362F3 !important; color: #fff !important; }
+  .s4-tcheck.live   { background: #f59e0b !important; color: #fff !important; }
+  .s4-tnum          { color: rgba(0,0,0,0.50) !important; }
+  .s4-ttitle        { color: #0f1115 !important; }
+  .s4-ttag          {
+    background: rgba(124,58,237,0.10) !important;
+    color: #7c3aed !important;
+  }
+  .s4-ttime         { color: rgba(0,0,0,0.55) !important; }
+  .s4-ttime.live    { color: #f59e0b !important; }
+
+  .hud strong::after {
+    content: ' v3';
+    color: #FFE7C0;
+  }
+</style>
+</head>
+<body>
+  <div class="stage">
+
+    <!-- BLOBS -->
+    <div class="blobs">
+      <svg viewBox="0 0 1452 709" preserveAspectRatio="xMidYMid slice">
+        <defs>
+          <filter id="b1" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+          <filter id="b2" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+          <filter id="b3" x="-50%" y="-100%" width="200%" height="300%"><feGaussianBlur stdDeviation="180"/></filter>
+        </defs>
+        <g filter="url(#b1)"><path d="M154.182 311.787C-10.8918 250.71 -133.683 497.9 -136 510H1481.72C1485.77 353.273 1482.53 57.4518 1437.12 127.979C1380.36 216.137 1178.79 61.7157 1075.12 39.8201C971.439 17.9245 860.811 198.852 666.778 299.111C472.744 399.369 319.255 372.864 154.182 311.787Z" fill="#ADC0FA"/></g>
+        <g filter="url(#b2)"><path d="M154.182 421.787C-10.8918 360.71 -133.683 607.9 -136 620H1481.72C1485.77 463.273 1482.53 167.452 1437.12 237.979C1380.36 326.137 1178.79 171.716 1075.12 149.82C971.439 127.924 860.811 308.852 666.778 409.111C472.744 509.369 319.255 482.864 154.182 421.787Z" fill="#CDB0FF"/></g>
+        <g filter="url(#b3)"><path d="M214.182 511.787C49.1082 450.71 -73.6832 697.9 -76 710H1541.72C1545.77 553.273 1542.53 257.452 1497.12 327.979C1440.36 416.137 1238.79 261.716 1135.12 239.82C1031.44 217.924 920.811 398.852 726.778 499.111C532.744 599.37 379.255 572.864 214.182 511.787Z" fill="#3362F3"/></g>
+      </svg>
+    </div>
+
+    <!-- GRID -->
+    <div class="grid">
+      <svg viewBox="0 0 1452 709" preserveAspectRatio="none">
+        <line x1="0" y1="637.5" x2="1451" y2="637.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="915.5" y1="10" x2="915.5" y2="720" stroke="white" stroke-opacity="0.33"/>
+        <line x1="537.5" y1="10" x2="537.5" y2="720" stroke="white" stroke-opacity="0.33"/>
+        <line x1="99.5" y1="0" x2="99.5" y2="710" stroke="white" stroke-opacity="0.33"/>
+        <line x1="1392.5" y1="0" x2="1392.5" y2="710" stroke="white" stroke-opacity="0.33"/>
+        <line x1="15" y1="554.5" x2="1466" y2="554.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="0" y1="153.5" x2="1451" y2="153.5" stroke="white" stroke-opacity="0.33"/>
+        <line x1="-7" y1="69.5" x2="1444" y2="69.5" stroke="white" stroke-opacity="0.33"/>
+      </svg>
+    </div>
+
+    <div class="card">
+
+      <div class="v2-shimmer"></div>
+
+      <div class="placeholder" id="mount">
+
+        <!-- SCENE 1 — PROPOSAL UI -->
+        <div class="s1">
+          <div class="s1-meta-row">
+            <div class="s1-tabs">
+              <div class="s1-tab active">Outline</div>
+              <div class="s1-tab">Content</div>
+              <div class="s1-tab">Review</div>
+            </div>
+            <span class="s1-meta-badge">Drafting</span>
+          </div>
+          <div class="s1-title">Acme — Banking Modernization</div>
+          <div class="s1-sections">
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">01</span><span class="s1-name">Executive Summary</span><span class="s1-status">Done</span><span class="s1-pages">2p</span></div>
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">02</span><span class="s1-name">Approach &amp; Methodology</span><span class="s1-status">Done</span><span class="s1-pages">6p</span></div>
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">03</span><span class="s1-name">Team &amp; Capabilities</span><span class="s1-status">Done</span><span class="s1-pages">4p</span></div>
+            <div class="s1-section"><span class="s1-drag"><span></span><span></span><span></span></span><span class="s1-num">04</span><span class="s1-name">Investment &amp; Timeline</span><span class="s1-status">Done</span><span class="s1-pages">3p</span></div>
+          </div>
+          <div class="s1-action">
+            <div><div class="s1-stat-l">Investment</div><div class="s1-stat-v"><span class="accent">$</span>284k</div></div>
+            <div><div class="s1-stat-l">Duration</div><div class="s1-stat-v">12 wks</div></div>
+            <div class="s1-cta">Generate <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg></div>
+          </div>
+        </div>
+
+        <!-- SCENE 2 — CODE TERMINAL -->
+        <div class="s2">
+          <div class="ide">
+            <div class="ide-bar">
+              <div class="ide-dots">
+                <span class="ide-dot r"></span><span class="ide-dot y"></span><span class="ide-dot g"></span>
+              </div>
+              <div class="ide-file">acme-platform / api / <span class="file-active">users.ts</span></div>
+              <div class="ide-status">Build · Ready</div>
+            </div>
+            <div class="ide-code">
+              <div class="ide-gutter"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+              <div class="ide-lines">
+                <div class="ide-line l1"><span class="typed"><span class="cm">// API · type-safe</span></span></div>
+                <div class="ide-line l2"><span class="typed"><span class="kw">export const</span> <span class="fn">getUsers</span> <span class="pun">= </span><span class="kw">async</span> <span class="pun">() =&gt; {</span></span></div>
+                <div class="ide-line l3 active"><span class="typed">&nbsp;&nbsp;<span class="kw">const</span> <span class="var">users</span> <span class="pun">= </span><span class="kw">await</span> <span class="var">db</span><span class="pun">.</span><span class="fn">query</span><span class="pun">(</span><span class="str">'users'</span><span class="pun">)</span></span></div>
+                <div class="ide-line l4"><span class="typed">&nbsp;&nbsp;<span class="kw">return</span> <span class="var">users</span><span class="pun">.</span><span class="fn">map</span><span class="pun">(</span><span class="fn">serialize</span><span class="pun">)</span></span></div>
+                <div class="ide-line l5"><span class="typed"><span class="pun">}</span></span></div>
+              </div>
+            </div>
+            <div class="ide-result">
+              <div class="result-l">
+                <div class="result-check"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg></div>
+                24 / 24 tests passing
+              </div>
+              <div class="result-meta"><span class="pass">2.3s</span> · coverage 94%</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SCENE 3 — STAFFING (Hero spotlight + talent constellation) -->
+        <div class="s3">
+
+          <!-- Hero spotlight: featured top match -->
+          <div class="s3-hero">
+            <div class="s3-tag">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l2.39 7.36H22l-6.18 4.49L18.21 22 12 17.27 5.79 22l2.39-8.15L2 9.36h7.61L12 2z"/></svg>
+              Top Match
+            </div>
+
+            <div class="s3-row">
+              <div class="s3-avatar-big">DO</div>
+              <div class="s3-hero-info">
+                <div class="s3-name">Daniel Okafor</div>
+                <div class="s3-role">Senior Backend Engineer</div>
+                <div class="s3-meta">9 yrs · UK · Banking</div>
+              </div>
+              <div class="s3-match-block">
+                <div class="s3-pct">95<sup>%</sup></div>
+                <div class="s3-match-lbl">Match</div>
+              </div>
+            </div>
+
+            <div class="s3-skills">
+              <span class="s3-chip">Node.js</span>
+              <span class="s3-chip">AWS</span>
+              <span class="s3-chip">Postgres</span>
+              <span class="s3-chip">Banking</span>
+              <span class="s3-chip">Senior</span>
+            </div>
+          </div>
+
+          <!-- Talent pool constellation -->
+          <div class="s3-pool">
+            <div class="s3-pool-head">
+              <span class="s3-pool-lbl">Talent Pool</span>
+              <span class="s3-pool-count"><b>11</b> more vetted · <b>47</b> sourced</span>
+            </div>
+            <div class="s3-strip">
+              <div class="s3-mini" style="background: linear-gradient(135deg, #ADC0FA, #3362F3)">PS</div>
+              <div class="s3-mini" style="background: linear-gradient(135deg, #CDB0FF, #7A5BD9)">SL</div>
+              <div class="s3-mini" style="background: linear-gradient(135deg, #FFE7C0, #FFA66A)">MK</div>
+              <div class="s3-mini" style="background: linear-gradient(135deg, #B8E0D2, #5DA68C)">JT</div>
+              <div class="s3-mini" style="background: linear-gradient(135deg, #FFCCD5, #E08899)">RA</div>
+              <div class="s3-mini" style="background: linear-gradient(135deg, #A8D8E8, #4A8FBC)">NB</div>
+              <div class="s3-mini" style="background: linear-gradient(135deg, #D5C5F0, #9B85C9)">AK</div>
+              <div class="s3-mini more">+39</div>
+            </div>
+          </div>
+
+          <!-- Action bar -->
+          <div class="s3-action">
+            <div class="s3-stat-inline">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              <span><b>9 days</b> avg fill</span>
+            </div>
+            <div class="s3-cta">
+              Schedule
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"/></svg>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- SCENE 4 — HELPDESK (live ops dashboard) -->
+        <div class="s4">
+          <div class="s4-panel">
+
+            <!-- Header -->
+            <div class="s4-bar">
+              <span class="s4-live">Live · 24/7 IT Support</span>
+              <span class="s4-sla">SLA <b>99.6%</b></span>
+            </div>
+
+            <!-- Hero metric -->
+            <div class="s4-hero">
+              <div class="s4-metric-row">
+                <svg class="s4-bolt" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13 2 L4 14 L11 14 L10 22 L20 10 L13 10 Z"/>
+                </svg>
+                <div class="s4-num">2.4<span class="s4-num-unit">min</span></div>
+                <div class="s4-trend-badge">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="6 9 12 15 18 9"/></svg>
+                  32% faster
+                </div>
+              </div>
+              <div class="s4-metric-lbl">Average response time · 24h</div>
+
+              <svg class="s4-spark" viewBox="0 0 220 28" preserveAspectRatio="none">
+                <line class="baseline" x1="0" y1="22" x2="220" y2="22"/>
+                <polyline points="0,18 20,12 40,15 60,8 80,14 100,6 120,10 140,4 160,9 180,3 200,7 220,2"
+                          stroke="#fff" stroke-width="1.5" fill="none"
+                          vector-effect="non-scaling-stroke"
+                          stroke-linejoin="round" stroke-linecap="round"/>
+                <polygon class="area" points="0,18 20,12 40,15 60,8 80,14 100,6 120,10 140,4 160,9 180,3 200,7 220,2 220,28 0,28"
+                         fill="rgba(173,192,250,0.18)"/>
+                <circle class="point" cx="220" cy="2" r="2.2" fill="#FFE7C0"/>
+              </svg>
+            </div>
+
+            <!-- Ticket activity stream -->
+            <div class="s4-stream">
+              <div class="s4-stream-h">
+                <span>Live Activity</span>
+                <span class="s4-stream-count"><b>47</b> resolved · <b>3</b> active</span>
+              </div>
+
+              <div class="s4-ticket" style="animation-delay: 17.85s;">
+                <div></div>
+                <div class="s4-tcheck">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span class="s4-ttitle"><span class="s4-tnum" style="display:inline; margin-right:6px;">#2847</span>Database connection timeout</span>
+                <span class="s4-ttag">API</span>
+                <span class="s4-ttime">2m 14s</span>
+              </div>
+
+              <div class="s4-ticket">
+                <div></div>
+                <div class="s4-tcheck">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span class="s4-ttitle"><span class="s4-tnum" style="display:inline; margin-right:6px;">#2846</span>Auth — 2FA delivery delay</span>
+                <span class="s4-ttag">Auth</span>
+                <span class="s4-ttime">4m 52s</span>
+              </div>
+
+              <div class="s4-ticket">
+                <div></div>
+                <div class="s4-tcheck">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3.5"><polyline points="20 6 9 17 4 12"/></svg>
+                </div>
+                <span class="s4-ttitle"><span class="s4-tnum" style="display:inline; margin-right:6px;">#2845</span>Dashboard chart misalign</span>
+                <span class="s4-ttag">UI</span>
+                <span class="s4-ttime">7m 03s</span>
+              </div>
+
+              <div class="s4-ticket active">
+                <div></div>
+                <div class="s4-tcheck live">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg>
+                </div>
+                <span class="s4-ttitle"><span class="s4-tnum" style="display:inline; margin-right:6px;">#2848</span>Webhook retry config</span>
+                <span class="s4-ttag">API</span>
+                <span class="s4-ttime live">live</span>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- CHAT INPUT -->
+      <div class="chat-text">Best at <span class="typing-text" id="typer">proposal development</span><span class="caret"></span></div>
+      <div class="chat-divider"></div>
+      <div class="chat-add">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.4"><path d="M12 5v14M5 12h14"/></svg>
+      </div>
+      <div class="chat-send">
+        <svg viewBox="0 0 24 24" fill="white">
+          <path d="M19.5 3.2c1.7-.5 3.3 1.1 2.8 2.8L20 14.7c-.4 1.7-2.4 2.4-3.8 1.3L9 9.5c-1.4-1.1-.8-3.3 1-3.8L19.5 3.2z" stroke="white" stroke-width="0.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
+
+    </div>
+
+  </div>
+
+  <div class="hud">
+    <strong>Banner · Full Sequence</strong> · Proposal → Software → Staffing → Helpdesk · 21s loop
+  </div>
+
+  <script>
+    const mount = document.getElementById('mount');
+    const html = mount.innerHTML;
+    const timeouts = [];
+
+    function clearAll() {
+      timeouts.forEach(t => clearTimeout(t));
+      timeouts.length = 0;
+    }
+
+    function eraseText(el, duration) {
+      const text = el.textContent;
+      const len = text.length;
+      const step = duration / len;
+      for (let i = 1; i <= len; i++) {
+        timeouts.push(setTimeout(() => {
+          el.textContent = text.slice(0, len - i);
+        }, i * step));
+      }
+    }
+
+    function typeText(el, text, duration) {
+      el.textContent = '';
+      const len = text.length;
+      const step = duration / len;
+      for (let i = 1; i <= len; i++) {
+        timeouts.push(setTimeout(() => {
+          el.textContent = text.slice(0, i);
+        }, i * step));
+      }
+    }
+
+    function start() {
+      clearAll();
+      mount.innerHTML = '';
+      void mount.offsetHeight;
+      mount.innerHTML = html;
+
+      const typer = document.getElementById('typer');
+      typer.textContent = 'proposal development';
+
+      // Phase 1 → Phase 2
+      timeouts.push(setTimeout(() => eraseText(typer, 1000), 1500));
+      timeouts.push(setTimeout(() => typeText(typer, 'software development', 1000), 3500));
+
+      // Phase 2 → Phase 3
+      timeouts.push(setTimeout(() => eraseText(typer, 1000), 8500));
+      timeouts.push(setTimeout(() => typeText(typer, 'staffing', 400), 10500));
+
+      // Phase 3 → Phase 4
+      timeouts.push(setTimeout(() => eraseText(typer, 400), 13500));
+      timeouts.push(setTimeout(() => typeText(typer, 'helpdesk', 400), 15500));
+    }
+
+    start();
+    setInterval(start, 21000);
+  </script>
+</body>
+</html>
