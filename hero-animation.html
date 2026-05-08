@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>RecruitTalent — Hero Animation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;450;500;600&display=swap" rel="stylesheet">
+<style>
+/* =============================================================
+   RecruitTalent — Hero Animation (Brava-style, brand-aligned)
+   Pixel-grid texture · type-on prompt loop · brand-blue accent
+   Tokens locked to existing style guide (Figma 1179:1999)
+   ============================================================= */
+
+:root {
+  /* Brand */
+  --brand:          #3362F3;
+  --brand-dim:      #2752E0;
+  --brand-100:      #D6E0FD;
+
+  /* Surface (light hero variant — matches editorial framework grid) */
+  --bg:             #FAFAF8;
+  --ink:            #0A0A0A;
+  --ink-2:          #6B7280;
+  --ink-3:          #9CA3AF;
+  --ink-4:          #C8CCD3;
+  --hairline:       rgba(10, 10, 10, 0.08);
+  --hairline-2:     rgba(10, 10, 10, 0.14);
+
+  /* Pixel grid */
+  --tile-size:      6px;
+  --tile-gap:       16px;
+  --tile-light:     rgba(10, 10, 10, 0.07);
+  --tile-dark:      rgba(10, 10, 10, 0.55);
+
+  /* Motion */
+  --ease-out:       cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-soft:      cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Frame */
+  --frame:          1456px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 100%; min-height: 100vh; }
+body {
+  font-family: 'Inter Tight', 'Suisse Intl', system-ui, -apple-system, sans-serif;
+  font-weight: 400;
+  background: var(--bg);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+/* ================== HERO STAGE ================== */
+.hero {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  min-height: 720px;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+/* ---- Pixel grid base (uniform light squares) ---- */
+.pixel-grid {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 1;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 16 16'><rect x='5' y='5' width='6' height='6' rx='1.2' fill='rgba(10,10,10,0.07)'/></svg>");
+  background-size: 16px 16px;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+
+/* ---- Twinkling dark squares (overlay) ---- */
+.twinkles {
+  position: absolute; inset: 0;
+  pointer-events: none;
+  z-index: 2;
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 8%, #000 92%, transparent 100%);
+}
+.twinkle {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 1.2px;
+  background: var(--tile-dark);
+  opacity: 0;
+  animation: twinkle var(--dur, 5s) ease-in-out infinite;
+  animation-delay: var(--delay, 0s);
+}
+@keyframes twinkle {
+  0%   { opacity: 0; }
+  20%  { opacity: var(--peak, 0.55); }
+  60%  { opacity: var(--peak, 0.55); }
+  100% { opacity: 0; }
+}
+
+/* ---- Brand-blue twinkle (rare, accent) ---- */
+.twinkle.accent { background: var(--brand); }
+
+/* ---- R brand-mark layer (pixel-art, Figma node 1679:5670) ---- */
+.r-mark {
+  position: absolute;
+  top: 50%;
+  left: 7%;
+  transform: translateY(-50%);
+  width: 256px;
+  height: 288px;
+  pointer-events: none;
+  z-index: 3;
+}
+.r-cell {
+  position: absolute;
+  width: 6px; height: 6px;
+  border-radius: 1.2px;
+  background: var(--brand);
+  box-shadow: 0 0 6px rgba(51, 98, 243, 0.35);
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.55s var(--ease-out),
+    transform 0.55s var(--ease-out);
+}
+.r-mark.active .r-cell {
+  opacity: 0.92;
+  transform: scale(1);
+}
+.r-mark__label {
+  position: absolute;
+  bottom: -28px; left: 0;
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  opacity: 0;
+  transition: opacity 0.4s var(--ease-out) 0.2s;
+}
+.r-mark.active .r-mark__label { opacity: 1; }
+@media (max-width: 1180px) {
+  .r-mark { display: none; }
+}
+
+/* ---- Top + bottom hairlines (full-bleed framework borders) ---- */
+.hero__top-rail,
+.hero__bottom-rail {
+  position: absolute; left: 0; right: 0;
+  height: 1px;
+  background: var(--hairline);
+  z-index: 5;
+}
+.hero__top-rail    { top: 88px; }
+.hero__bottom-rail { bottom: 88px; }
+
+/* ================== NAV ================== */
+.hero__nav {
+  position: absolute; top: 0; left: 0; right: 0;
+  z-index: 10;
+  height: 88px;
+  display: flex; align-items: center;
+  padding: 0 32px;
+}
+.hero__nav-frame {
+  width: 100%; max-width: var(--frame);
+  margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+}
+.brand-mark {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+.brand-mark b { color: var(--brand); font-weight: 500; }
+.nav-links {
+  display: flex; gap: 36px;
+  font-size: 14px;
+  color: var(--ink-2);
+  list-style: none;
+}
+.nav-links li { cursor: pointer; transition: color 0.2s var(--ease-out); }
+.nav-links li:hover { color: var(--ink); }
+.nav-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 32px; padding: 0 14px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 13px; font-weight: 500;
+  border: none; border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), transform 0.2s var(--ease-out);
+}
+.nav-cta:hover { background: var(--brand); transform: translateY(-1px); }
+.nav-cta svg { width: 12px; height: 12px; }
+
+/* ================== CHAT INPUT (centerpiece) ================== */
+.chat-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  pointer-events: none;
+  padding: 0 24px;
+}
+
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  height: 28px; padding: 0 14px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-2);
+  margin-bottom: 28px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fade-up 0.9s var(--ease-out) 0.2s forwards;
+  pointer-events: auto;
+}
+.eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--brand);
+  box-shadow: 0 0 10px rgba(51, 98, 243, 0.7);
+  animation: pulse 2.4s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50%      { opacity: 1;   transform: scale(1.25); }
+}
+@keyframes fade-up {
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chat-input {
+  width: 560px; max-width: 100%;
+  min-height: 144px;
+  background: #0A0A0A;
+  border-radius: 18px;
+  padding: 20px 22px 16px;
+  display: flex; flex-direction: column; justify-content: space-between;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.04) inset,
+    0 24px 48px rgba(10, 10, 10, 0.18),
+    0 4px 12px rgba(10, 10, 10, 0.08);
+  pointer-events: auto;
+  opacity: 0;
+  transform: translateY(12px) scale(0.98);
+  animation: chat-in 0.95s var(--ease-out) 0.5s forwards;
+  position: relative;
+}
+@keyframes chat-in {
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.chat-text {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 400;
+  font-size: 17px;
+  line-height: 1.45;
+  color: #FFFFFF;
+  letter-spacing: -0.005em;
+  min-height: 70px;
+  padding-top: 4px;
+}
+.chat-text .typed { white-space: pre; }
+.chat-text .cursor {
+  display: inline-block;
+  width: 2px;
+  height: 18px;
+  background: #FFFFFF;
+  margin-left: 1px;
+  transform: translateY(3px);
+  animation: caret 1s steps(2) infinite;
+}
+@keyframes caret {
+  50% { opacity: 0; }
+}
+
+.chat-controls {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-top: 8px;
+}
+.ctrl-left, .ctrl-right {
+  display: flex; align-items: center; gap: 12px;
+}
+.ctrl-btn {
+  width: 30px; height: 30px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.18);
+  color: rgba(255,255,255,0.7);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.ctrl-btn:hover { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.35); }
+.ctrl-btn svg { width: 14px; height: 14px; }
+
+.ctrl-mic {
+  border: none;
+  width: 30px; height: 30px;
+  background: transparent;
+  color: rgba(255,255,255,0.65);
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  transition: color 0.2s var(--ease-out);
+}
+.ctrl-mic:hover { color: #fff; }
+
+.ctrl-send {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, #4A78FF 0%, var(--brand) 50%, var(--brand-dim) 100%);
+  color: #fff;
+  display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.3) inset,
+    0 4px 14px rgba(51, 98, 243, 0.45);
+  transition: transform 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+  position: relative;
+}
+.ctrl-send:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.3) inset,
+    0 6px 18px rgba(51, 98, 243, 0.6);
+}
+.ctrl-send::before {
+  content: '';
+  position: absolute; inset: -4px;
+  border-radius: 50%;
+  background: var(--brand);
+  filter: blur(12px);
+  opacity: 0.35;
+  z-index: -1;
+}
+.ctrl-send svg { width: 14px; height: 14px; }
+
+/* Wave bars (audio icon) */
+.wave {
+  display: inline-flex; align-items: center; gap: 2px;
+  height: 14px;
+}
+.wave span {
+  display: inline-block;
+  width: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  animation: wave 1.2s ease-in-out infinite;
+}
+.wave span:nth-child(1) { height: 6px;  animation-delay: 0s; }
+.wave span:nth-child(2) { height: 12px; animation-delay: 0.15s; }
+.wave span:nth-child(3) { height: 8px;  animation-delay: 0.30s; }
+.wave span:nth-child(4) { height: 10px; animation-delay: 0.45s; }
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+  50%      { transform: scaleY(1.1); opacity: 1; }
+}
+
+/* Suggested prompt chips below the input */
+.chips {
+  display: flex; flex-wrap: wrap; justify-content: center; gap: 8px;
+  margin-top: 22px;
+  opacity: 0;
+  transform: translateY(8px);
+  animation: fade-up 0.9s var(--ease-out) 1.4s forwards;
+  pointer-events: auto;
+  max-width: 580px;
+}
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  height: 28px; padding: 0 12px;
+  background: rgba(255,255,255,0.7);
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  font-size: 12px;
+  color: var(--ink-2);
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  transition: background 0.2s var(--ease-out), color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.chip:hover {
+  background: var(--ink);
+  color: #fff;
+  border-color: var(--ink);
+}
+
+/* ================== TRUST STRIP ================== */
+.trust-strip {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  z-index: 5;
+  height: 88px;
+  display: flex; align-items: center;
+  border-top: 1px solid var(--hairline);
+  padding: 0 32px;
+  background: var(--bg);
+}
+.trust-strip__frame {
+  width: 100%; max-width: var(--frame);
+  margin: 0 auto;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 48px;
+}
+.trust-label {
+  font-size: 11px; letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  white-space: nowrap;
+}
+.trust-marquee {
+  flex: 1;
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 10%, #000 90%, transparent);
+}
+.trust-track {
+  display: flex; gap: 64px;
+  animation: marquee 32s linear infinite;
+  white-space: nowrap;
+  width: max-content;
+}
+.trust-item {
+  font-family: 'Inter Tight', sans-serif;
+  font-weight: 500;
+  font-size: 18px;
+  letter-spacing: -0.01em;
+  color: var(--ink-2);
+  opacity: 0.7;
+  transition: opacity 0.2s var(--ease-out);
+}
+.trust-item:hover { opacity: 1; }
+@keyframes marquee {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001s !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001s !important;
+  }
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 768px) {
+  .hero { min-height: 640px; }
+  .hero__top-rail { top: 64px; }
+  .hero__bottom-rail { bottom: 72px; }
+  .hero__nav { height: 64px; padding: 0 20px; }
+  .nav-links { display: none; }
+  .chat-input { width: 100%; min-height: 132px; padding: 18px 18px 14px; }
+  .chat-text { font-size: 15px; }
+  .trust-strip { padding: 0 20px; height: 72px; }
+  .trust-strip__frame { gap: 24px; }
+  .trust-label { font-size: 10px; }
+  .trust-item { font-size: 14px; }
+  .chips { gap: 6px; margin-top: 16px; }
+  .chip { font-size: 11px; height: 26px; padding: 0 10px; }
+}
+</style>
+</head>
+<body>
+
+<section class="hero">
+
+  <!-- Pixel grid layers -->
+  <div class="pixel-grid"></div>
+  <div class="twinkles" id="twinkles"></div>
+  <div class="r-mark" id="rMark" aria-hidden="true">
+    <span class="r-mark__label">RecruitTalent</span>
+  </div>
+
+  <!-- Top + bottom hairlines -->
+  <div class="hero__top-rail"></div>
+  <div class="hero__bottom-rail"></div>
+
+  <!-- Top nav -->
+  <header class="hero__nav">
+    <div class="hero__nav-frame">
+      <div class="brand-mark">Recruit<b>Talent</b></div>
+      <ul class="nav-links">
+        <li>Services</li>
+        <li>Industries</li>
+        <li>Case Studies</li>
+        <li>Insights</li>
+        <li>Contact</li>
+      </ul>
+      <button class="nav-cta">
+        Get started
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round">
+          <line x1="12" y1="5" x2="12" y2="19" />
+          <line x1="5" y1="12" x2="19" y2="12" />
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Centered chat input -->
+  <div class="chat-wrap">
+
+    <div class="eyebrow">
+      <span class="dot"></span>
+      <span>Tell us what you need</span>
+    </div>
+
+    <div class="chat-input" role="group" aria-label="Project request input">
+
+      <div class="chat-text">
+        <span class="typed" id="typed"></span><span class="cursor" aria-hidden="true"></span>
+      </div>
+
+      <div class="chat-controls">
+        <div class="ctrl-left">
+          <button class="ctrl-btn" aria-label="Add attachment" title="Attach">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          </button>
+        </div>
+
+        <div class="ctrl-right">
+          <button class="ctrl-mic" aria-label="Voice input" title="Voice">
+            <span class="wave"><span></span><span></span><span></span><span></span></span>
+          </button>
+          <button class="ctrl-send" aria-label="Send request" title="Send">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="19" x2="12" y2="5" />
+              <polyline points="5 12 12 5 19 12" />
+            </svg>
+          </button>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="chips">
+      <button class="chip" data-prompt="Find me a senior cleared engineer ready to start in 14 days...">Cleared engineer · 14 days</button>
+      <button class="chip" data-prompt="Stand up a proposal team for an upcoming federal RFP...">Proposal team · federal RFP</button>
+      <button class="chip" data-prompt="Augment my dev team with three full-stack engineers...">Team augmentation</button>
+      <button class="chip" data-prompt="Manage my IT operations end-to-end with 24/7 support...">Managed IT services</button>
+    </div>
+
+  </div>
+
+  <!-- Trust strip -->
+  <div class="trust-strip">
+    <div class="trust-strip__frame">
+      <span class="trust-label">Trusted by</span>
+      <div class="trust-marquee">
+        <div class="trust-track" id="trustTrack">
+          <span class="trust-item">U.S. Department of Defense</span>
+          <span class="trust-item">·</span>
+          <span class="trust-item">IBM Technologies</span>
+          <span class="trust-item">·</span>
+          <span class="trust-item">Lockheed Martin</span>
+          <span class="trust-item">·</span>
+          <span class="trust-item">General Dynamics</span>
+          <span class="trust-item">·</span>
+          <span class="trust-item">Northrop Grumman</span>
+          <span class="trust-item">·</span>
+          <span class="trust-item">Booz Allen Hamilton</span>
+          <span class="trust-item">·</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</section>
+
+<script>
+/* ============= Twinkling dark squares ============= */
+(function () {
+  const layer = document.getElementById('twinkles');
+  if (!layer) return;
+
+  // Tunables
+  const TILE = 16;        // grid cell size
+  const COUNT_BASE = 90;  // base count (scaled by viewport)
+
+  function build() {
+    layer.innerHTML = '';
+    const w = layer.offsetWidth;
+    const h = layer.offsetHeight;
+    const colsTotal = Math.floor(w / TILE);
+    const rowsTotal = Math.floor(h / TILE);
+    const count = Math.min(180, Math.max(60, Math.round(colsTotal * rowsTotal * 0.012)));
+
+    const used = new Set();
+    let placed = 0, tries = 0;
+
+    while (placed < count && tries < count * 6) {
+      tries++;
+      const col = Math.floor(Math.random() * colsTotal);
+      const row = Math.floor(Math.random() * rowsTotal);
+      const key = col + ':' + row;
+      if (used.has(key)) continue;
+      used.add(key);
+      placed++;
+
+      const t = document.createElement('span');
+      t.className = 'twinkle' + (Math.random() < 0.06 ? ' accent' : '');
+      // Position centered in the cell to align with the SVG tile pattern
+      t.style.left = (col * TILE + 5) + 'px';
+      t.style.top  = (row * TILE + 5) + 'px';
+      t.style.setProperty('--dur',   (3.5 + Math.random() * 5).toFixed(2) + 's');
+      t.style.setProperty('--delay', (-Math.random() * 6).toFixed(2) + 's');
+      t.style.setProperty('--peak',  (0.35 + Math.random() * 0.45).toFixed(2));
+      layer.appendChild(t);
+    }
+  }
+
+  build();
+  let to = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(to);
+    to = setTimeout(build, 200);
+  });
+})();
+
+/* ============= R brand-mark builder (Figma 1679:5670) ============= */
+(function () {
+  const layer = document.getElementById('rMark');
+  if (!layer) return;
+
+  // Pixel-art R, 16 cols × 18 rows. '#' = filled brand-blue cell.
+  const R_PATTERN = [
+    '################',
+    '################',
+    '################',
+    '################',
+    '################',
+    '................',
+    '###.............',
+    '###.............',
+    '###..###........',
+    '###...###.......',
+    '###....###......',
+    '###.....###.....',
+    '###......###....',
+    '###.......###...',
+    '###........###..',
+    '###.........###.',
+    '###..........###',
+    '###..........###'
+  ];
+
+  const TILE = 16;
+  const PAT_W = R_PATTERN[0].length;
+  const PAT_H = R_PATTERN.length;
+
+  function build() {
+    // Clear existing r-cells, keep the label
+    layer.querySelectorAll('.r-cell').forEach(n => n.remove());
+
+    // Center-align the pixel pattern within the layer's bounding box
+    const lw = layer.offsetWidth;
+    const lh = layer.offsetHeight;
+    const offX = Math.round((lw - PAT_W * TILE) / 2);
+    const offY = Math.round((lh - PAT_H * TILE) / 2);
+
+    // Pre-collect coordinates so we can stagger by distance from anchor
+    const cells = [];
+    for (let r = 0; r < PAT_H; r++) {
+      for (let c = 0; c < PAT_W; c++) {
+        if (R_PATTERN[r][c] === '#') cells.push([r, c]);
+      }
+    }
+
+    // Stagger from top-left → bottom-right (gives a "drawing" feel)
+    cells.sort((a, b) => (a[0] + a[1]) - (b[0] + b[1]));
+
+    cells.forEach(([r, c], i) => {
+      const cell = document.createElement('span');
+      cell.className = 'r-cell';
+      cell.style.left = (offX + c * TILE + 5) + 'px';
+      cell.style.top  = (offY + r * TILE + 5) + 'px';
+      // Stagger build-in: 0 → ~520ms across the shape
+      const delay = (i / cells.length) * 0.52;
+      cell.style.transitionDelay = delay.toFixed(3) + 's';
+      layer.appendChild(cell);
+    });
+  }
+
+  build();
+  let to = null;
+  window.addEventListener('resize', () => {
+    clearTimeout(to);
+    to = setTimeout(build, 200);
+  });
+
+  // Cycle: build-in (≈0.6s stagger) → hold 4s → build-out (≈0.6s) → rest 8s
+  function cycle() {
+    layer.classList.add('active');
+    setTimeout(() => layer.classList.remove('active'), 5200);
+  }
+  // First cycle ~3s after load, then every 13s
+  setTimeout(() => { cycle(); setInterval(cycle, 13000); }, 3000);
+})();
+
+/* ============= Type-on prompt loop ============= */
+(function () {
+  const target = document.getElementById('typed');
+  if (!target) return;
+
+  const prompts = [
+    'Find me a senior cleared engineer ready to start in 14 days...',
+    'Stand up a proposal team for an upcoming federal RFP...',
+    'Augment my dev team with three full-stack engineers...',
+    'Manage my IT operations end-to-end with 24/7 support...',
+    'Build a custom app for our agency intake workflow...'
+  ];
+
+  const TYPE_MS  = 45;
+  const ERASE_MS = 22;
+  const HOLD_MS  = 1600;
+  const GAP_MS   = 380;
+
+  let idx = 0;
+  let cancelType = false;
+
+  // Allow chips to inject a custom prompt
+  document.querySelectorAll('.chip').forEach(btn => {
+    btn.addEventListener('click', () => {
+      cancelType = true;
+      const p = btn.dataset.prompt || btn.textContent;
+      typeOnce(p);
+    });
+  });
+
+  function sleep(ms) { return new Promise(r => setTimeout(r, ms)); }
+
+  async function typeText(text) {
+    cancelType = false;
+    for (let j = 0; j <= text.length; j++) {
+      if (cancelType) return;
+      target.textContent = text.slice(0, j);
+      await sleep(TYPE_MS + Math.random() * 25);
+    }
+  }
+  async function eraseText() {
+    const cur = target.textContent;
+    for (let j = cur.length; j >= 0; j--) {
+      if (cancelType) return;
+      target.textContent = cur.slice(0, j);
+      await sleep(ERASE_MS);
+    }
+  }
+  async function typeOnce(text) {
+    await eraseText();
+    await sleep(120);
+    await typeText(text);
+    // pause typing here; user clicked a chip
+  }
+
+  async function loop() {
+    // small lead-in to align with chat-input intro animation
+    await sleep(1100);
+    while (true) {
+      const text = prompts[idx % prompts.length];
+      await typeText(text);
+      if (cancelType) { cancelType = false; await sleep(2200); continue; }
+      await sleep(HOLD_MS);
+      await eraseText();
+      if (cancelType) { cancelType = false; await sleep(2200); continue; }
+      await sleep(GAP_MS);
+      idx++;
+    }
+  }
+  loop();
+})();
+
+/* ============= Duplicate marquee items for seamless loop ============= */
+(function () {
+  const track = document.getElementById('trustTrack');
+  if (!track) return;
+  track.innerHTML = track.innerHTML + track.innerHTML;
+})();
+</script>
+
+</body>
+</html>
